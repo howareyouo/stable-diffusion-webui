@@ -84,7 +84,7 @@ window.document.addEventListener('drop', e => {
 
         let prompt_target = get_tab_index('tabs') == 1 ? "img2img_prompt_image" : "txt2img_prompt_image";
 
-        const imgParent = gradioApp().getElementById(prompt_target);
+        const imgParent = _(prompt_target);
         const files = e.dataTransfer.files;
         const fileInput = imgParent.querySelector('input[type="file"]');
         if (fileInput) {
@@ -109,7 +109,7 @@ window.addEventListener('paste', e => {
         return;
     }
 
-    const visibleImageFields = [...gradioApp().querySelectorAll('[data-testid="image"]')]
+    const visibleImageFields = [...$$('[data-testid="image"]')]
         .filter(el => uiElementIsVisible(el))
         .sort((a, b) => uiElementInSight(b) - uiElementInSight(a));
 

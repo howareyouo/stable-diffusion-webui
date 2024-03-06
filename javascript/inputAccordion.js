@@ -1,13 +1,13 @@
 function inputAccordionChecked(id, checked) {
-    var accordion = gradioApp().getElementById(id);
+    var accordion = _(id);
     accordion.visibleCheckbox.checked = checked;
     accordion.onVisibleCheckboxChange();
 }
 
 function setupAccordion(accordion) {
     var labelWrap = accordion.querySelector('.label-wrap');
-    var gradioCheckbox = gradioApp().querySelector('#' + accordion.id + "-checkbox input");
-    var extra = gradioApp().querySelector('#' + accordion.id + "-extra");
+    var gradioCheckbox = $('#' + accordion.id + "-checkbox input");
+    var extra = $('#' + accordion.id + "-extra");
     var span = labelWrap.querySelector('span');
     var linked = true;
 
@@ -62,7 +62,7 @@ function setupAccordion(accordion) {
 }
 
 onUiLoaded(function() {
-    for (var accordion of gradioApp().querySelectorAll('.input-accordion')) {
+    for (var accordion of $$('.input-accordion')) {
         setupAccordion(accordion);
     }
 });

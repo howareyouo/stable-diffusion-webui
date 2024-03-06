@@ -1,36 +1,41 @@
-function gradioApp() {
-    const elems = document.getElementsByTagName('gradio-app');
-    const elem = elems.length == 0 ? document : elems[0];
+let gradioApp = () => document
+let _ = id => document.getElementById(id)
+let $ = (selector, node = document) => node.querySelector(':scope ' + selector)
+let $$ = (selector, node = document) => [...node.querySelectorAll(':scope ' + selector)]
+EventTarget.prototype.on = EventTarget.prototype.addEventListener
+String.prototype.splice = function (start, rem, add) {
+    return this.slice(0, start) + add + this.slice(start + Math.abs(rem))
+}
 
-    if (elem !== document) {
-        elem.getElementById = function(id) {
-            return document.getElementById(id);
-        };
+function debounce(func, timeout = 150) {
+    let timer
+    return (...args) => {
+        clearTimeout(timer)
+        timer = setTimeout(() => func.apply(this, args), timeout)
     }
-    return elem.shadowRoot ? elem.shadowRoot : elem;
 }
 
 /**
  * Get the currently selected top-level UI tab button (e.g. the button that says "Extras").
  */
 function get_uiCurrentTab() {
-    return gradioApp().querySelector('#tabs > .tab-nav > button.selected');
+    return $('#tabs > .tab-nav .selected')
 }
 
 /**
  * Get the first currently visible top-level UI tab content (e.g. the div hosting the "txt2img" UI).
  */
 function get_uiCurrentTabContent() {
-    return gradioApp().querySelector('#tabs > .tabitem[id^=tab_]:not([style*="display: none"])');
+    return $('#tabs > .tabitem[style$="block;"]')
 }
 
-var uiUpdateCallbacks = [];
-var uiAfterUpdateCallbacks = [];
-var uiLoadedCallbacks = [];
-var uiTabChangeCallbacks = [];
-var optionsChangedCallbacks = [];
-var uiAfterUpdateTimeout = null;
-var uiCurrentTab = null;
+let uiUpdateCallbacks = []
+let uiAfterUpdateCallbacks = []
+let uiLoadedCallbacks = []
+let uiTabChangeCallbacks = []
+let optionsChangedCallbacks = []
+let uiAfterUpdateTimeout = null
+let uiCurrentTab = null
 
 /**
  * Register callback to be called at each UI update.
@@ -78,7 +83,7 @@ function onOptionsChanged(callback) {
 }
 
 function executeCallbacks(queue, arg) {
-    for (const callback of queue) {
+    for (let callback of queue) {
         try {
             callback(arg);
         } catch (e) {
@@ -100,47 +105,82 @@ function scheduleAfterUiUpdateCallbacks() {
     }, 200);
 }
 
-var executedOnLoaded = false;
+let executedOnLoaded = false
 
-document.addEventListener("DOMContentLoaded", function() {
-    var mutationObserver = new MutationObserver(function(m) {
-        if (!executedOnLoaded && gradioApp().querySelector('#txt2img_prompt')) {
-            executedOnLoaded = true;
-            executeCallbacks(uiLoadedCallbacks);
+document.on("DOMContentLoaded", function() {
+    let mutationObserver = new MutationObserver(function (m) {
+        if (!executedOnLoaded && $('#txt2img_prompt')) {
+            executedOnLoaded = true
+            executeCallbacks(uiLoadedCallbacks)
         }
 
-        executeCallbacks(uiUpdateCallbacks, m);
-        scheduleAfterUiUpdateCallbacks();
-        const newTab = get_uiCurrentTab();
+        executeCallbacks(uiUpdateCallbacks, m)
+        scheduleAfterUiUpdateCallbacks()
+        let newTab = get_uiCurrentTab()?.innerText
         if (newTab && (newTab !== uiCurrentTab)) {
-            uiCurrentTab = newTab;
-            executeCallbacks(uiTabChangeCallbacks);
+            uiCurrentTab = newTab
+            executeCallbacks(uiTabChangeCallbacks)
         }
-    });
+    })
     mutationObserver.observe(gradioApp(), {childList: true, subtree: true});
 });
+
+/**
+ * checks that a UI element is not in another hidden element or tab content
+ */
+function uiElementIsVisible(el) {
+    if (el === document) {
+        return true;
+    }
+
+    let computedStyle = getComputedStyle(el);
+    let isVisible = computedStyle.display !== 'none';
+
+    if (!isVisible) return false;
+    return uiElementIsVisible(el.parentNode);
+}
+
+function uiElementInSight(el) {
+    let clRect = el.getBoundingClientRect();
+    let windowHeight = window.innerHeight;
+    let isOnScreen = clRect.bottom > 0 && clRect.top < windowHeight;
+
+    return isOnScreen;
+}
+
+function elementIndex(element) {
+    return [].indexOf.call(element.parentElement.children, element)
+}
+
+function createEl(tag, clazz, attrs, parent) {
+    let el = document.createElement(tag)
+    clazz && (el.className = clazz)
+    attrs && Object.assign(el, attrs)
+    parent && parent.appendChild(el)
+    return el
+}
 
 /**
  * Add keyboard shortcuts:
  * Ctrl+Enter to start/restart a generation
  * Alt/Option+Enter to skip a generation
  * Esc to interrupt a generation
- */
-document.addEventListener('keydown', function(e) {
-    const isEnter = e.key === 'Enter' || e.keyCode === 13;
-    const isCtrlKey = e.metaKey || e.ctrlKey;
-    const isAltKey = e.altKey;
-    const isEsc = e.key === 'Escape';
+ 
+document.on('keydown', function(e) {
+    let isEnter = e.key === 'Enter' || e.keyCode === 13;
+    let isCtrlKey = e.metaKey || e.ctrlKey;
+    let isAltKey = e.altKey;
+    let isEsc = e.key === 'Escape';
 
-    const generateButton = get_uiCurrentTabContent().querySelector('button[id$=_generate]');
-    const interruptButton = get_uiCurrentTabContent().querySelector('button[id$=_interrupt]');
-    const skipButton = get_uiCurrentTabContent().querySelector('button[id$=_skip]');
+    let generateButton = get_uiCurrentTabContent().querySelector('button[id$=_generate]');
+    let interruptButton = get_uiCurrentTabContent().querySelector('button[id$=_interrupt]');
+    let skipButton = get_uiCurrentTabContent().querySelector('button[id$=_skip]');
 
     if (isCtrlKey && isEnter) {
         if (interruptButton.style.display === 'block') {
             interruptButton.click();
-            const callback = (mutationList) => {
-                for (const mutation of mutationList) {
+            let callback = (mutationList) => {
+                for (let mutation of mutationList) {
                     if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
                         if (interruptButton.style.display === 'none') {
                             generateButton.click();
@@ -149,7 +189,7 @@ document.addEventListener('keydown', function(e) {
                     }
                 }
             };
-            const observer = new MutationObserver(callback);
+            let observer = new MutationObserver(callback);
             observer.observe(interruptButton, {attributes: true});
         } else {
             generateButton.click();
@@ -163,10 +203,10 @@ document.addEventListener('keydown', function(e) {
     }
 
     if (isEsc) {
-        const globalPopup = document.querySelector('.global-popup');
-        const lightboxModal = document.querySelector('#lightboxModal');
+        let globalPopup = document.querySelector('.global-popup');
+        let lightbox = document.querySelector('#lightbox');
         if (!globalPopup || globalPopup.style.display === 'none') {
-            if (document.activeElement === lightboxModal) return;
+            if (document.activeElement === lightbox) return;
             if (interruptButton.style.display === 'block') {
                 interruptButton.click();
                 e.preventDefault();
@@ -174,26 +214,111 @@ document.addEventListener('keydown', function(e) {
         }
     }
 });
+*/
+
+function doGenerate(e) {
+    get_uiCurrentTabContent().querySelector('button[id$=_generate]')?.click()
+    if (e) {
+        e.stopPropagation()
+        e.preventDefault()
+    }
+}
+
+function generationInfo(tab, key) {
+    let el = $(`#generation_info_${tab} textarea`)
+    if (el.value) {
+        let o = JSON.parse(el.value)
+        return key ? o[key] : o
+    }
+    return ''
+}
+
+function toggleSeed(reuse) {
+    let input = $(`#${uiCurrentTab}_seed input`)
+    let seed = -1
+    if (reuse == undefined && input.value == -1) {
+        seed = generationInfo(uiCurrentTab, 'seed')
+    } else if (reuse) {
+        seed = input.value
+        if (seed == -1) {
+            seed = generationInfo(uiCurrentTab, 'seed')
+        }
+    }
+    updateInput(input, seed)
+}
+
+function toggleHr(enable) {
+    let input = $(`#${uiCurrentTab}_hr-checkbox input`)
+    enable = enable == undefined ? !input.checked : enable
+    input.checked = enable
+    updateInput(input)
+}
+
+function isEditable(el) {
+    return el.isContentEditable || el.tagName == 'TEXTAREA' ||
+        (el.tagName == 'INPUT' && ['text', 'number', 'search'].includes(el.type))
+}
 
 /**
- * checks that a UI element is not in another hidden element or tab content
+ * Add a ctrl+enter as a shortcut to start a generation
  */
-function uiElementIsVisible(el) {
-    if (el === document) {
-        return true;
+on('keydown', e => {
+    let el = e.target
+    let imgtab = uiCurrentTab?.endsWith('2img')
+    let editable = isEditable(el)
+    let genable = imgtab && !editable && !e.ctrlKey
+    if (e.altKey) e.preventDefault()
+    switch (e.code) {
+        case 'Space':
+            if (editable) return
+        case 'Tab':
+            e.preventDefault()
+            toggleModal()
+            break
+        case 'KeyR':
+            genable && toggleSeed()
+            break
+        case 'KeyF':
+            genable && toggleHr()
+            break
+        case 'KeyG':
+            genable && toggleHr(1)
+        case 'KeyC':
+            genable && toggleSeed(1)
+        case 'KeyZ':
+        case 'KeyX':
+            if (genable) {
+                if (e.altKey || e.code == 'KeyZ') {
+                    toggleSeed(0)
+                    toggleHr(0)
+                }
+                doGenerate(e)
+            }
+            break
+        case 'Enter':
+            if (e.metaKey || e.ctrlKey || e.altKey) {
+                doGenerate(e)
+            }
+            break
+        case 'Backquote':
+            el.tagName == 'INPUT' && el.blur()
+        case 'ShiftRight':
+            imgtab && doGenerate(e)
+            break
+        default:
+            if (!(editable || isNaN(e.key) || e.ctrlKey)) {
+                let tab = (imgtab ? `#${uiCurrentTab}_extra_tabs` : '#tabs') + `>.tab-nav>button:nth-child(${e.key})`
+                $(tab)?.click()
+            }
     }
+}, true)
 
-    const computedStyle = getComputedStyle(el);
-    const isVisible = computedStyle.display !== 'none';
-
-    if (!isVisible) return false;
-    return uiElementIsVisible(el.parentNode);
-}
-
-function uiElementInSight(el) {
-    const clRect = el.getBoundingClientRect();
-    const windowHeight = window.innerHeight;
-    const isOnScreen = clRect.bottom > 0 && clRect.top < windowHeight;
-
-    return isOnScreen;
-}
+on("auxclick", e => {
+    switch (e.button) {
+        case 3:
+            doGenerate(e)
+            break
+        case 4:
+            toggleModal()
+    }
+}, true)

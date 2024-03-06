@@ -6,7 +6,7 @@ let settingsExcludeTabsFromShowAll = {
 };
 
 function settingsShowAllTabs() {
-    gradioApp().querySelectorAll('#settings > div').forEach(function(elem) {
+    $$('#settings > div').forEach(function(elem) {
         if (settingsExcludeTabsFromShowAll[elem.id]) return;
 
         elem.style.display = "block";
@@ -14,19 +14,19 @@ function settingsShowAllTabs() {
 }
 
 function settingsShowOneTab() {
-    gradioApp().querySelector('#settings_show_one_page').click();
+    $('#settings_show_one_page').click();
 }
 
 onUiLoaded(function() {
-    var edit = gradioApp().querySelector('#settings_search');
-    var editTextarea = gradioApp().querySelector('#settings_search > label > input');
-    var buttonShowAllPages = gradioApp().getElementById('settings_show_all_pages');
-    var settings_tabs = gradioApp().querySelector('#settings div');
+    var edit = $('#settings_search');
+    var editTextarea = $('#settings_search > label > input');
+    var buttonShowAllPages = _('settings_show_all_pages');
+    var settings_tabs = $('#settings div');
 
     onEdit('settingsSearch', editTextarea, 250, function() {
         var searchText = (editTextarea.value || "").trim().toLowerCase();
 
-        gradioApp().querySelectorAll('#settings > div[id^=settings_] div[id^=column_settings_] > *').forEach(function(elem) {
+        $$('#settings > div[id^=settings_] div[id^=column_settings_] > *').forEach(function(elem) {
             var visible = elem.textContent.trim().toLowerCase().indexOf(searchText) != -1;
             elem.style.display = visible ? "" : "none";
         });
@@ -47,10 +47,10 @@ onUiLoaded(function() {
 
 
 onOptionsChanged(function() {
-    if (gradioApp().querySelector('#settings .settings-category')) return;
+    if ($('#settings .settings-category')) return;
 
     var sectionMap = {};
-    gradioApp().querySelectorAll('#settings > div > button').forEach(function(x) {
+    $$('#settings > div > button').forEach(function(x) {
         sectionMap[x.textContent.trim()] = x;
     });
 

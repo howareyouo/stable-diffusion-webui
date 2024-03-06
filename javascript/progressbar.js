@@ -69,125 +69,98 @@ function randomId() {
     return "task(" + Math.random().toString(36).slice(2, 7) + Math.random().toString(36).slice(2, 7) + Math.random().toString(36).slice(2, 7) + ")";
 }
 
+const progressListeners = []
+const doneText = 'Complete...'
+
+function registerProgressLiseners(cb) {
+    progressListeners.push(cb)
+}
+
+function notifyPregressChange(percent, progressText, previewImg) {
+    progressListeners.forEach(cb => cb(percent, progressText, previewImg))
+}
+
 // starts sending progress requests to "/internal/progress" uri, creating progressbar above progressbarContainer element and
 // preview inside gallery element. Cleans up all created stuff when the task is over and calls atEnd.
 // calls onProgress every time there is a progress update
-function requestProgress(id_task, progressbarContainer, gallery, atEnd, onProgress, inactivityTimeout = 40) {
-    var dateStart = new Date();
-    var wasEverActive = false;
-    var parentProgressbar = progressbarContainer.parentNode;
+// sending progress requests to "/internal/progress" uri, creating progressbar inside progressbarContainer element
+// and preview inside gallery element. Cleans up all created stuff when the task is over and calls atEnd.
+// calls onProgress every time there is a progress update
+function requestProgress(id_task, progressContainer, gallery, atEnd, onProgress, inactivityTimeout = 40) {
+    let wasEverActive = false
+    let timeStart = Date.now()
+    let livePreview
 
-    var divProgress = document.createElement('div');
-    divProgress.className = 'progressDiv';
-    divProgress.style.display = opts.show_progressbar ? "block" : "none";
-    var divInner = document.createElement('div');
-    divInner.className = 'progress';
-
-    divProgress.appendChild(divInner);
-    parentProgressbar.insertBefore(divProgress, progressbarContainer);
-
-    var livePreview = null;
-
-    var removeProgressBar = function() {
-        if (!divProgress) return;
-
-        setTitle("");
-        parentProgressbar.removeChild(divProgress);
-        if (gallery && livePreview) gallery.removeChild(livePreview);
-        atEnd();
-
-        divProgress = null;
-    };
-
-    var funProgress = function(id_task) {
-        request("./internal/progress", {id_task: id_task, live_preview: false}, function(res) {
-            if (res.completed) {
-                removeProgressBar();
-                return;
-            }
-
-            let progressText = "";
-
-            divInner.style.width = ((res.progress || 0) * 100.0) + '%';
-            divInner.style.background = res.progress ? "" : "transparent";
-
-            if (res.progress > 0) {
-                progressText = ((res.progress || 0) * 100.0).toFixed(0) + '%';
-            }
-
-            if (res.eta) {
-                progressText += " ETA: " + formatTime(res.eta);
-            }
-
-            setTitle(progressText);
-
-            if (res.textinfo && res.textinfo.indexOf("\n") == -1) {
-                progressText = res.textinfo + " " + progressText;
-            }
-
-            divInner.textContent = progressText;
-
-            var elapsedFromStart = (new Date() - dateStart) / 1000;
-
-            if (res.active) wasEverActive = true;
-
-            if (!res.active && wasEverActive) {
-                removeProgressBar();
-                return;
-            }
-
-            if (elapsedFromStart > inactivityTimeout && !res.queued && !res.active) {
-                removeProgressBar();
-                return;
-            }
-
-            if (onProgress) {
-                onProgress(res);
-            }
-
-            setTimeout(() => {
-                funProgress(id_task, res.id_live_preview);
-            }, opts.live_preview_refresh_period || 500);
-        }, function() {
-            removeProgressBar();
-        });
-    };
-
-    var funLivePreview = function(id_task, id_live_preview) {
-        request("./internal/progress", {id_task: id_task, id_live_preview: id_live_preview}, function(res) {
-            if (!divProgress) {
-                return;
-            }
-
-            if (res.live_preview && gallery) {
-                var img = new Image();
-                img.onload = function() {
-                    if (!livePreview) {
-                        livePreview = document.createElement('div');
-                        livePreview.className = 'livePreview';
-                        gallery.insertBefore(livePreview, gallery.firstElementChild);
-                    }
-
-                    livePreview.appendChild(img);
-                    if (livePreview.childElementCount > 2) {
-                        livePreview.removeChild(livePreview.firstElementChild);
-                    }
-                };
-                img.src = res.live_preview;
-            }
-
-            setTimeout(() => {
-                funLivePreview(id_task, res.id_live_preview);
-            }, opts.live_preview_refresh_period || 500);
-        }, function() {
-            removeProgressBar();
-        });
-    };
-
-    funProgress(id_task, 0);
+    let progress = createEl('div', 'progress', {style: {display: opts.show_progressbar ? 'flex' : 'none'}}, progressContainer)
+    let bar = createEl('div', 'progress-bar', 0, progress)
 
     if (gallery) {
-        funLivePreview(id_task, 0);
+        livePreview = createEl('div', 'live-preview', '', gallery)
     }
 
+    function removeProgressBar(completed) {
+        setTitle('', completed)
+        progressContainer.removeChild(progress)
+        gallery && gallery.removeChild(livePreview)
+        atEnd()
+    }
+
+    let tick = opts.live_preview_refresh_period || 999, i = 0
+    let func = function (id_task, id_live_preview) {
+        request('./internal/progress', {id_task, id_live_preview}, function (res) {
+            if (res.completed) {
+                bar.style.width = '100%'
+                bar.innerText = doneText
+                setTimeout(removeProgressBar, 777, 1)
+                notifyPregressChange(100, doneText)
+                return
+            }
+            let progressText = ''
+            let percent = res.progress * 100
+            
+            if (res.progress > 0) {
+                progressText = percent.toFixed(0) + '%'
+            }
+            if (res.eta) {
+                progressText += ' ETA: ' + formatTime(res.eta)
+            }
+            setTitle(progressText)
+            if (res.textinfo) {
+                progressText = res.textinfo + ' ' + progressText
+            }
+            bar.style.width = percent + '%'
+            bar.innerText = progressText
+            notifyPregressChange(percent, progressText, res.live_preview)
+
+            let elapsedTime = (Date.now() - timeStart) / 1000
+            if (res.active) {
+                wasEverActive = true
+            }
+            if (!res.active && wasEverActive) {
+                return removeProgressBar()
+            }
+            if (elapsedTime > inactivityTimeout && !res.queued && !res.active) {
+                return removeProgressBar()
+            }
+            if (res.live_preview && gallery) {
+                livePreview.style.height = gallery.getBoundingClientRect().height + 'px'
+                let img = new Image()
+                img.onload = () => livePreview.replaceChildren(img)
+                img.src = res.live_preview
+            }
+            if (onProgress) {
+                onProgress(res)
+            }
+
+            setTimeout(func, tick, id_task, res.id_live_preview)
+            
+            if (++i >= 3 || res.queued)
+                tick = Math.min(3333, elapsedTime / i * 2222)
+            else
+                tick = Math.max(333, tick * (1 - res.progress))
+            
+        }, removeProgressBar)
+    }
+
+    func(id_task, 0)
 }

@@ -172,7 +172,7 @@
 })();
 
 onUiLoaded(function() {
-    for (var elem of gradioApp().querySelectorAll('.resize-handle-row')) {
+    for (var elem of $$('.resize-handle-row')) {
         if (!elem.querySelector('.resize-handle')) {
             setupResizeHandle(elem);
         }

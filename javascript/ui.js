@@ -8,7 +8,7 @@ function set_theme(theme) {
 }
 
 function all_gallery_buttons() {
-    var allGalleryButtons = gradioApp().querySelectorAll('[style="display: block;"].tabitem div[id$=_gallery].gradio-gallery .thumbnails > .thumbnail-item.thumbnail-small');
+    var allGalleryButtons = $$('#tabs .tabitem[style$="block;"] .gradio-gallery .thumbnails .thumbnail-item.thumbnail-small')
     var visibleGalleryButtons = [];
     allGalleryButtons.forEach(function(elem) {
         if (elem.parentElement.offsetParent) {
@@ -47,14 +47,14 @@ function extract_image_from_gallery(gallery) {
 window.args_to_array = Array.from; // Compatibility with e.g. extensions that may expect this to be around
 
 function switch_to_txt2img() {
-    gradioApp().querySelector('#tabs').querySelectorAll('button')[0].click();
+    $('#tabs').querySelectorAll('button')[0].click();
 
     return Array.from(arguments);
 }
 
 function switch_to_img2img_tab(no) {
-    gradioApp().querySelector('#tabs').querySelectorAll('button')[1].click();
-    gradioApp().getElementById('mode_img2img').querySelectorAll('button')[no].click();
+    $('#tabs').querySelectorAll('button')[1].click();
+    _('mode_img2img').querySelectorAll('button')[no].click();
 }
 function switch_to_img2img() {
     switch_to_img2img_tab(0);
@@ -77,13 +77,13 @@ function switch_to_inpaint_sketch() {
 }
 
 function switch_to_extras() {
-    gradioApp().querySelector('#tabs').querySelectorAll('button')[2].click();
+    $('#tabs').querySelectorAll('button')[2].click();
 
     return Array.from(arguments);
 }
 
 function get_tab_index(tabId) {
-    let buttons = gradioApp().getElementById(tabId).querySelector('div').querySelectorAll('button');
+    let buttons = _(tabId).querySelector('div').querySelectorAll('button');
     for (let i = 0; i < buttons.length; i++) {
         if (buttons[i].classList.contains('selected')) {
             return i;
@@ -120,9 +120,9 @@ function create_submit_args(args) {
 }
 
 function setSubmitButtonsVisibility(tabname, showInterrupt, showSkip, showInterrupting) {
-    gradioApp().getElementById(tabname + '_interrupt').style.display = showInterrupt ? "block" : "none";
-    gradioApp().getElementById(tabname + '_skip').style.display = showSkip ? "block" : "none";
-    gradioApp().getElementById(tabname + '_interrupting').style.display = showInterrupting ? "block" : "none";
+    _(tabname + '_interrupt').style.display = showInterrupt ? "block" : "none";
+    _(tabname + '_skip').style.display = showSkip ? "block" : "none";
+    _(tabname + '_interrupting').style.display = showInterrupting ? "block" : "none";
 }
 
 function showSubmitButtons(tabname, show) {
@@ -134,7 +134,7 @@ function showSubmitInterruptingPlaceholder(tabname) {
 }
 
 function showRestoreProgressButton(tabname, show) {
-    var button = gradioApp().getElementById(tabname + "_restore_progress");
+    var button = _(tabname + "_restore_progress");
     if (!button) return;
 
     button.style.display = show ? "flex" : "none";
@@ -146,7 +146,7 @@ function submit() {
     var id = randomId();
     localSet("txt2img_task_id", id);
 
-    requestProgress(id, gradioApp().getElementById('txt2img_gallery_container'), gradioApp().getElementById('txt2img_gallery'), function() {
+    requestProgress(id, _('txt2img_gallery_container'), _('txt2img_gallery'), function() {
         showSubmitButtons('txt2img', true);
         localRemove("txt2img_task_id");
         showRestoreProgressButton('txt2img', false);
@@ -173,7 +173,7 @@ function submit_img2img() {
     var id = randomId();
     localSet("img2img_task_id", id);
 
-    requestProgress(id, gradioApp().getElementById('img2img_gallery_container'), gradioApp().getElementById('img2img_gallery'), function() {
+    requestProgress(id, _('img2img_gallery_container'), _('img2img_gallery'), function() {
         showSubmitButtons('img2img', true);
         localRemove("img2img_task_id");
         showRestoreProgressButton('img2img', false);
@@ -192,7 +192,7 @@ function submit_extras() {
 
     var id = randomId();
 
-    requestProgress(id, gradioApp().getElementById('extras_gallery_container'), gradioApp().getElementById('extras_gallery'), function() {
+    requestProgress(id, _('extras_gallery_container'), _('extras_gallery'), function() {
         showSubmitButtons('extras', true);
     });
 
@@ -209,7 +209,7 @@ function restoreProgressTxt2img() {
     var id = localGet("txt2img_task_id");
 
     if (id) {
-        requestProgress(id, gradioApp().getElementById('txt2img_gallery_container'), gradioApp().getElementById('txt2img_gallery'), function() {
+        requestProgress(id, _('txt2img_gallery_container'), _('txt2img_gallery'), function() {
             showSubmitButtons('txt2img', true);
         }, null, 0);
     }
@@ -223,7 +223,7 @@ function restoreProgressImg2img() {
     var id = localGet("img2img_task_id");
 
     if (id) {
-        requestProgress(id, gradioApp().getElementById('img2img_gallery_container'), gradioApp().getElementById('img2img_gallery'), function() {
+        requestProgress(id, _('img2img_gallery_container'), _('img2img_gallery'), function() {
             showSubmitButtons('img2img', true);
         }, null, 0);
     }
@@ -237,8 +237,8 @@ function restoreProgressImg2img() {
  * pasting of resolutions in the form of "width x height".
  */
 function setupResolutionPasting(tabname) {
-    var width = gradioApp().querySelector(`#${tabname}_width input[type=number]`);
-    var height = gradioApp().querySelector(`#${tabname}_height input[type=number]`);
+    var width = $(`#${tabname}_width input[type=number]`);
+    var height = $(`#${tabname}_height input[type=number]`);
     for (const el of [width, height]) {
         el.addEventListener('paste', function(event) {
             var pasteData = event.clipboardData.getData('text/plain');
@@ -264,7 +264,7 @@ onUiLoaded(function() {
 
 function modelmerger() {
     var id = randomId();
-    requestProgress(id, gradioApp().getElementById('modelmerger_results_panel'), null, function() {});
+    requestProgress(id, _('modelmerger_results_panel'), null, function() {});
 
     var res = create_submit_args(arguments);
     res[0] = id;
@@ -291,7 +291,7 @@ var opts = {};
 onAfterUiUpdate(function() {
     if (Object.keys(opts).length != 0) return;
 
-    var json_elem = gradioApp().getElementById('settings_json');
+    var json_elem = _('settings_json');
     if (json_elem == null) return;
 
     var textarea = json_elem.querySelector('textarea');
@@ -322,7 +322,7 @@ onAfterUiUpdate(function() {
 });
 
 onOptionsChanged(function() {
-    var elem = gradioApp().getElementById('sd_checkpoint_hash');
+    var elem = _('sd_checkpoint_hash');
     var sd_checkpoint_hash = opts.sd_checkpoint_hash || "";
     var shorthash = sd_checkpoint_hash.substring(0, 10);
 
@@ -353,21 +353,22 @@ function restart_reload() {
 
 // Simulate an `input` DOM event for Gradio Textbox component. Needed after you edit its contents in javascript, otherwise your edits
 // will only visible on web page and not sent to python.
-function updateInput(target) {
-    let e = new Event("input", {bubbles: true});
-    Object.defineProperty(e, "target", {value: target});
-    target.dispatchEvent(e);
+function updateInput (target, val) {
+    if (val != undefined) target.value = val
+    let evt = new Event('input', {bubbles: true})
+    Object.defineProperty(evt, 'target', {value: target})
+    target.dispatchEvent(evt)
 }
 
 
 var desiredCheckpointName = null;
 function selectCheckpoint(name) {
     desiredCheckpointName = name;
-    gradioApp().getElementById('change_checkpoint').click();
+    _('change_checkpoint').click();
 }
 
 function currentImg2imgSourceResolution(w, h, scaleBy) {
-    var img = gradioApp().querySelector('#mode_img2img > div[style="display: block;"] img');
+    var img = $('#mode_img2img > div[style="display: block;"] img');
     return img ? [img.naturalWidth, img.naturalHeight, scaleBy] : [0, 0, scaleBy];
 }
 
@@ -376,7 +377,7 @@ function updateImg2imgResizeToTextAfterChangingImage() {
     // There may be a better solution, but this is simple and straightforward so I'm going with it.
 
     setTimeout(function() {
-        gradioApp().getElementById('img2img_update_resize_to').click();
+        _('img2img_update_resize_to').click();
     }, 500);
 
     return [];
@@ -384,9 +385,8 @@ function updateImg2imgResizeToTextAfterChangingImage() {
 }
 
 
-
 function setRandomSeed(elem_id) {
-    var input = gradioApp().querySelector("#" + elem_id + " input");
+    var input = $("#" + elem_id + " input");
     if (!input) return [];
 
     input.value = "-1";
@@ -395,8 +395,8 @@ function setRandomSeed(elem_id) {
 }
 
 function switchWidthHeight(tabname) {
-    var width = gradioApp().querySelector("#" + tabname + "_width input[type=number]");
-    var height = gradioApp().querySelector("#" + tabname + "_height input[type=number]");
+    var width = $("#" + tabname + "_width input[type=number]");
+    var height = $("#" + tabname + "_height input[type=number]");
     if (!width || !height) return [];
 
     var tmp = width.value;

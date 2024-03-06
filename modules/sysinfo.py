@@ -36,11 +36,22 @@ environment_whitelist = {
     "IGNORE_CMD_ARGS_ERRORS",
 }
 
+# get relative path
+def shorten(filepath:str) -> str:
+    mi = filepath.find("models" + os.sep)
+    if mi >= 0:
+        return filepath[mi + 7:]
+    return filepath
+
+
+def hr_size(filepath:str) -> str:
+    stat = os.stat(filepath)
+    return pretty_bytes(stat.st_size)
 
 def pretty_bytes(num, suffix="B"):
     for unit in ["", "K", "M", "G", "T", "P", "E", "Z", "Y"]:
         if abs(num) < 1024 or unit == 'Y':
-            return f"{num:.0f}{unit}{suffix}"
+            return f"{num:.2f}{unit}{suffix}"
         num /= 1024
 
 

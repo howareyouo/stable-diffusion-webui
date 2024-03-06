@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Optional, Union
 from dataclasses import dataclass
 
-from modules import shared, ui_extra_networks_user_metadata, errors, extra_networks, util
+from modules import shared, ui_extra_networks_user_metadata, errors, extra_networks, util, sysinfo
 from modules.images import read_info_from_image, save_image_with_geninfo
 import gradio as gr
 import json
@@ -303,6 +303,8 @@ class ExtraNetworksPage:
             "local_preview": quote_js(item["local_preview"]),
             "metadata_button": btn_metadata,
             "name": html.escape(item["name"]),
+            "filename": filename,
+            "size": sysinfo.hr_size(filename),
             "prompt": item.get("prompt", None),
             "save_card_preview": html.escape(f"return saveCardPreview(event, '{tabname}', '{item['local_preview']}');"),
             "search_only": " search_only" if search_only else "",
@@ -563,12 +565,14 @@ class ExtraNetworksPage:
         List of default keys used for sorting in the UI.
         """
         pth = Path(path)
+        stat = pth.stat()
         mtime, ctime = self.lister.mctime(path)
         return {
-            "date_created": int(mtime),
-            "date_modified": int(ctime),
+            "created": int(ctime),
+            "modified": int(mtime),
             "name": pth.name.lower(),
             "path": str(pth).lower(),
+            "size": stat.st_size
         }
 
     def find_preview(self, path):
@@ -611,9 +615,9 @@ def register_default_pages():
     from modules.ui_extra_networks_textual_inversion import ExtraNetworksPageTextualInversion
     from modules.ui_extra_networks_hypernets import ExtraNetworksPageHypernetworks
     from modules.ui_extra_networks_checkpoints import ExtraNetworksPageCheckpoints
+    register_page(ExtraNetworksPageCheckpoints())
     register_page(ExtraNetworksPageTextualInversion())
     register_page(ExtraNetworksPageHypernetworks())
-    register_page(ExtraNetworksPageCheckpoints())
 
 
 class ExtraNetworksUi:
