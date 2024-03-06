@@ -43,23 +43,18 @@ function registerPrompt(tabname, id) {
 }
 
 function setupExtraNetworksForTab(tabname) {
-    let tabnav = $('#' + tabname + '_extra_tabs > div.tab-nav')
-    let controlsDiv = createEl('DIV', 'extra-networks-controls-div', '', tabnav);
+    let tabnav = $(`#${tabname}_extra_tabs > .tab-nav`)
+    let controlsDiv = createEl('div', 'extra-networks-controls-div', '', tabnav);
 
     $$(`#${tabname}_extra_tabs .extra-page`).forEach(function(page) {
-        let search = $('#' + page.id + '_extra_search')
-        let sort_mode = $('#' + page.id + '_extra_sort')
-        let sort_dir = $('#' + page.id + '_extra_sort_dir')
-        let refresh = $('#' + page.id + '_extra_refresh')
-
-        // If any of the buttons above don't exist, we want to skip this iteration of the loop.
-        if (!search || !sort_mode || !sort_dir || !refresh) {
-            return // `return` is equivalent of `continue` but for forEach loops.
-        }
-
+        let search = $(`#${page.id}_extra_search`)
+        let sort_mode = $('.extra-network-sort', page)
+        let sort_dir = $(`#${page.id}_extra_sort_dir`)
+        
         let applyFilter = function (force) {
             let searchTerm = search.value.toLowerCase()
-            $$('#' + tabname + '_extra_tabs div.card').forEach(function (elem) {
+            let parent = $('.extra-network-cards', page)
+            for (let elem of parent.children) {
                 let searchOnly = elem.querySelector('.search_only')
                 let text = Array.prototype.map.call(elem.querySelectorAll('.search_terms'), function (t) {
                     return t.textContent.toLowerCase()
@@ -70,25 +65,16 @@ function setupExtraNetworksForTab(tabname) {
                     visible = false
                 }
                 elem.style.display = visible ? '' : 'none'
-            })
+            }
 
             applySort(force)
         }
 
         let applySort = function(force) {
+            let reverse = sort_dir.dataset.sortdir == 'Desc'
+            let sortKey = "sort" + sort_mode.value
             let parent = $('.extra-network-cards', page)
-            let cards = parent.children
-            let reverse = sort_dir.dataset.sortdir == 'Descending'
-            let sortKey = sort_mode.dataset.sortmode.toLowerCase().replace('sort', '').replaceAll(' ', '_').replace(/_+$/, '').trim() || 'name'
-            sortKey = "sort" + sortKey.charAt(0).toUpperCase() + sortKey.slice(1);
-            let sortKeyStore = sortKey + '-' + (reverse ? 'Descending' : 'Ascending') + '-' + cards.length
-
-            if (sortKeyStore == sort_mode.dataset.sortkey && !force) {
-                return
-            }
-            sort_mode.dataset.sortkey = sortKeyStore;
-
-            let sorted = Array.from(cards)
+            let sorted = Array.from(parent.children)
             sorted.sort(function(cardA, cardB) {
                 let a = cardA.dataset[sortKey]
                 let b = cardB.dataset[sortKey]
@@ -166,19 +152,15 @@ function extraNetworksTabSelected(tabname, id, showPrompt, showNegativePrompt, t
     extraNetworksShowControlsForPage(tabname, tabname_full);
 }
 
-function applyExtraNetworkFilter(tabname_full) {
-    let doFilter = function () {
-        let applyFunction = extraNetworksApplyFilter[tabname_full]
-
-        if (applyFunction) {
-            applyFunction(true)
-        }
+function applyExtraNetworkFilter(tabname_full, subdir) {
+    if (subdir != undefined) {
+        $(`#${tabname_full}_extra_search`).value = subdir
     }
-    setTimeout(doFilter, 1);
+    setTimeout(() => extraNetworksApplyFilter[tabname_full](true), 1)
 }
 
 function applyExtraNetworkSort(tabname_full) {
-    setTimeout(() => extraNetworksApplySort[tabname_full](true), 1);
+    setTimeout(() => extraNetworksApplySort[tabname_full](true), 1)
 }
 
 let extraNetworksApplyFilter = {};
@@ -269,149 +251,6 @@ function saveCardPreview(event, tabname, filename) {
     event.preventDefault();
 }
 
-function extraNetworksTreeProcessFileClick(event, btn, tabname, extra_networks_tabname) {
-    /**
-     * Processes `onclick` events when user clicks on files in tree.
-     *
-     * @param event                     The generated event.
-     * @param btn                       The clicked `tree-list-item` button.
-     * @param tabname                   The name of the active tab in the sd webui. Ex: txt2img, img2img, etc.
-     * @param extra_networks_tabname    The id of the active extraNetworks tab. Ex: lora, checkpoints, etc.
-     */
-    // NOTE: Currently unused.
-    return;
-}
-
-function extraNetworksTreeProcessDirectoryClick(event, btn, tabname, extra_networks_tabname) {
-    /**
-     * Processes `onclick` events when user clicks on directories in tree.
-     *
-     * Here is how the tree reacts to clicks for various states:
-     * unselected unopened directory: Diretory is selected and expanded.
-     * unselected opened directory: Directory is selected.
-     * selected opened directory: Directory is collapsed and deselected.
-     * chevron is clicked: Directory is expanded or collapsed. Selected state unchanged.
-     *
-     * @param event                     The generated event.
-     * @param btn                       The clicked `tree-list-item` button.
-     * @param tabname                   The name of the active tab in the sd webui. Ex: txt2img, img2img, etc.
-     * @param extra_networks_tabname    The id of the active extraNetworks tab. Ex: lora, checkpoints, etc.
-     */
-    let ul = btn.nextElementSibling
-    // This is the actual target that the user clicked on within the target button.
-    // We use this to detect if the chevron was clicked.
-    let true_targ = event.target
-
-    function _expand_or_collapse(_ul, _btn) {
-        // Expands <ul> if it is collapsed, collapses otherwise. Updates button attributes.
-        if (_ul.hasAttribute("hidden")) {
-            _ul.removeAttribute("hidden");
-            _btn.dataset.expanded = "";
-        } else {
-            _ul.setAttribute("hidden", "");
-            delete _btn.dataset.expanded;
-        }
-    }
-
-    function _remove_selected_from_all() {
-        // Removes the `selected` attribute from all buttons.
-        $$('div.tree-list-content').forEach(el => {
-            delete el.dataset.selected;
-        });
-    }
-
-    function _select_button(_btn) {
-        // Removes `data-selected` attribute from all buttons then adds to passed button.
-        _remove_selected_from_all();
-        _btn.dataset.selected = "";
-    }
-
-    function _update_search(_tabname, _extra_networks_tabname, _search_text) {
-        // Update search input with select button's path.
-        let search_input_elem = $('#' + tabname + '_' + extra_networks_tabname + '_extra_search')
-        search_input_elem.value = _search_text;
-        updateInput(search_input_elem);
-    }
-
-
-    // If user clicks on the chevron, then we do not select the folder.
-    if (true_targ.matches(".tree-list-item-action--leading, .tree-list-item-action-chevron")) {
-        _expand_or_collapse(ul, btn);
-    } else {
-        // User clicked anywhere else on the button.
-        if ("selected" in btn.dataset && !(ul.hasAttribute("hidden"))) {
-            // If folder is select and open, collapse and deselect button.
-            _expand_or_collapse(ul, btn);
-            delete btn.dataset.selected;
-            _update_search(tabname, extra_networks_tabname, "");
-        } else if (!(!("selected" in btn.dataset) && !(ul.hasAttribute("hidden")))) {
-            // If folder is open and not selected, then we don't collapse; just select.
-            // NOTE: Double inversion sucks but it is the clearest way to show the branching here.
-            _expand_or_collapse(ul, btn);
-            _select_button(btn, tabname, extra_networks_tabname);
-            _update_search(tabname, extra_networks_tabname, btn.dataset.path);
-        } else {
-            // All other cases, just select the button.
-            _select_button(btn, tabname, extra_networks_tabname);
-            _update_search(tabname, extra_networks_tabname, btn.dataset.path);
-        }
-    }
-}
-
-function extraNetworksTreeOnClick(event, tabname, extra_networks_tabname) {
-    /**
-     * Handles `onclick` events for buttons within an `extra-network-tree .tree-list--tree`.
-     *
-     * Determines whether the clicked button in the tree is for a file entry or a directory
-     * then calls the appropriate function.
-     *
-     * @param event                     The generated event.
-     * @param tabname                   The name of the active tab in the sd webui. Ex: txt2img, img2img, etc.
-     * @param extra_networks_tabname    The id of the active extraNetworks tab. Ex: lora, checkpoints, etc.
-     */
-    let btn = event.currentTarget
-    let par = btn.parentElement
-    if (par.dataset.treeEntryType === "file") {
-        extraNetworksTreeProcessFileClick(event, btn, tabname, extra_networks_tabname);
-    } else {
-        extraNetworksTreeProcessDirectoryClick(event, btn, tabname, extra_networks_tabname);
-    }
-}
-
-function extraNetworksControlSortOnClick(event, tabname, extra_networks_tabname) {
-    /**
-     * Handles `onclick` events for the Sort Mode button.
-     *
-     * Modifies the data attributes of the Sort Mode button to cycle between
-     * various sorting modes.
-     *
-     * @param event                     The generated event.
-     * @param tabname                   The name of the active tab in the sd webui. Ex: txt2img, img2img, etc.
-     * @param extra_networks_tabname    The id of the active extraNetworks tab. Ex: lora, checkpoints, etc.
-     */
-    let curr_mode = event.currentTarget.dataset.sortmode
-    let el_sort_dir = $('#' + tabname + '_' + extra_networks_tabname + '_extra_sort_dir')
-    let sort_dir = el_sort_dir.dataset.sortdir
-    if (curr_mode == "path") {
-        event.currentTarget.dataset.sortmode = "name";
-        event.currentTarget.dataset.sortkey = "sortName-" + sort_dir + "-640";
-        event.currentTarget.setAttribute("title", "Sort by filename");
-    } else if (curr_mode == "name") {
-        event.currentTarget.dataset.sortmode = "created";
-        event.currentTarget.dataset.sortkey = "sort-created-" + sort_dir + "-640";
-        event.currentTarget.setAttribute("title", "Sort by date created");
-    } else if (curr_mode == "created") {
-        event.currentTarget.dataset.sortmode = "modified";
-        event.currentTarget.dataset.sortkey = "sort-modified-" + sort_dir + "-640";
-        event.currentTarget.setAttribute("title", "Sort by date modified");
-    } else {
-        event.currentTarget.dataset.sortmode = "path";
-        event.currentTarget.dataset.sortkey = "sortPath-" + sort_dir + "-640";
-        event.currentTarget.setAttribute("title", "Sort by path");
-    }
-    applyExtraNetworkSort(tabname + "_" + extra_networks_tabname);
-}
-
 function extraNetworksControlSortDirOnClick(event, tabname, extra_networks_tabname) {
     /**
      * Handles `onclick` events for the Sort Direction button.
@@ -423,29 +262,17 @@ function extraNetworksControlSortDirOnClick(event, tabname, extra_networks_tabna
      * @param tabname                   The name of the active tab in the sd webui. Ex: txt2img, img2img, etc.
      * @param extra_networks_tabname    The id of the active extraNetworks tab. Ex: lora, checkpoints, etc.
      */
-    if (event.currentTarget.dataset.sortdir == "Ascending") {
-        event.currentTarget.dataset.sortdir = "Descending";
-        event.currentTarget.setAttribute("title", "Sort descending");
+    let el = event.currentTarget
+    if (el.dataset.sortdir == "Asc") {
+        el.dataset.sortdir = "Desc";
+        el.setAttribute("title", "Sort descending");
     } else {
-        event.currentTarget.dataset.sortdir = "Ascending";
-        event.currentTarget.setAttribute("title", "Sort ascending");
+        el.dataset.sortdir = "Asc";
+        el.setAttribute("title", "Sort ascending");
     }
     applyExtraNetworkSort(tabname + "_" + extra_networks_tabname);
 }
 
-function extraNetworksControlTreeViewOnClick(event, tabname, extra_networks_tabname) {
-    /**
-     * Handles `onclick` events for the Tree View button.
-     *
-     * Toggles the tree view in the extra networks pane.
-     *
-     * @param event                     The generated event.
-     * @param tabname                   The name of the active tab in the sd webui. Ex: txt2img, img2img, etc.
-     * @param extra_networks_tabname    The id of the active extraNetworks tab. Ex: lora, checkpoints, etc.
-     */
-    _(tabname + "_" + extra_networks_tabname + "_tree").classList.toggle("hidden");
-    event.currentTarget.classList.toggle("extra-network-control--enabled");
-}
 
 function extraNetworksControlRefreshOnClick(event, tabname, extra_networks_tabname) {
     /**
@@ -535,8 +362,7 @@ function requestGet(url, data, handler, errorHandler) {
             }
         }
     };
-    let js = JSON.stringify(data);
-    xhr.send(js);
+    xhr.send(JSON.stringify(data))
 }
 
 function extraNetworksCopyCardPath(event, path) {

@@ -17,9 +17,9 @@ onAfterUiUpdate(function() {
 
     const galleryPreviews = $$('.thumbnail-item > img');
 
-    if (galleryPreviews == null) return;
+    if (galleryPreviews.length == 0) return
 
-    const headImg = galleryPreviews[0]?.src;
+    const headImg = galleryPreviews[0].src
 
     if (headImg == null || headImg == lastHeadImg) return;
 
@@ -35,7 +35,7 @@ onAfterUiUpdate(function() {
     if (document.hasFocus()) return;
 
     // Multiple copies of the images are in the DOM when one is selected. Dedup with a Set to get the real number generated.
-    const imgs = new Set(Array.from(galleryPreviews).map(img => img.src));
+    const imgs = new Set(galleryPreviews).map(img => img.src);
 
     const notification = new Notification(
         'Stable Diffusion',
@@ -51,7 +51,5 @@ onAfterUiUpdate(function() {
         this.close();
     };
 
-    setTimeout(() => {
-        notification.close()
-    }, 9999);
+    setTimeout(() => notification.close(), 9999);
 });
