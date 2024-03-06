@@ -71,7 +71,7 @@ function setupExtraNetworksForTab(tabname) {
         }
 
         let applySort = function(force) {
-            let reverse = sort_dir.dataset.sortdir == 'Desc'
+            let reverse = sort_dir.dataset.sortdir == 'Descending'
             let sortKey = "sort" + sort_mode.value
             let parent = $('.extra-network-cards', page)
             let sorted = Array.from(parent.children)
@@ -263,11 +263,11 @@ function extraNetworksControlSortDirOnClick(event, tabname, extra_networks_tabna
      * @param extra_networks_tabname    The id of the active extraNetworks tab. Ex: lora, checkpoints, etc.
      */
     let el = event.currentTarget
-    if (el.dataset.sortdir == "Asc") {
-        el.dataset.sortdir = "Desc";
+    if (el.dataset.sortdir == "Ascending") {
+        el.dataset.sortdir = "Descending";
         el.setAttribute("title", "Sort descending");
     } else {
-        el.dataset.sortdir = "Asc";
+        el.dataset.sortdir = "Ascending";
         el.setAttribute("title", "Sort ascending");
     }
     applyExtraNetworkSort(tabname + "_" + extra_networks_tabname);

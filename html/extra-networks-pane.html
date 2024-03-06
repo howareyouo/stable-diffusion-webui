@@ -1,12 +1,11 @@
-<div id='{tabname}_{extra_networks_tabname}_pane' class='extra-network-pane'>
+<!-- <div id='{tabname}_{extra_networks_tabname}_pane' class='extra-network-pane'> -->
     <div class="extra-network-control" id="{tabname}_{extra_networks_tabname}_controls" style="display:none" >
         <div class="extra-network-control--search">
-            <input
+            <input 
                 id="{tabname}_{extra_networks_tabname}_extra_search"
                 class="extra-network-control--search-text"
                 type="search"
-                placeholder="Filter files"
-            >
+                placeholder="Filter files">
         </div>
         <select class="extra-network-sort" onchange="applyExtraNetworkSort('{tabname}_{extra_networks_tabname}')">
             <option>Default</option>
@@ -21,16 +20,14 @@
             class="extra-network-control--sort-dir"
             data-sortdir="{data_sortdir}"
             title="Sort ascending"
-            onclick="extraNetworksControlSortDirOnClick(event, '{tabname}', '{extra_networks_tabname}')"
-        >
+            onclick="extraNetworksControlSortDirOnClick(event, '{tabname}', '{extra_networks_tabname}')">
             <i class="extra-network-control--sort-dir-icon"></i>
         </div>
         <div
             id="{tabname}_{extra_networks_tabname}_extra_refresh"
             class="extra-network-control--refresh"
             title="Refresh page"
-            onclick="extraNetworksControlRefreshOnClick(event, '{tabname}', '{extra_networks_tabname}')"
-        >
+            onclick="extraNetworksControlRefreshOnClick(event, '{tabname}', '{extra_networks_tabname}')">
             <i class="extra-network-control--refresh-icon"></i>
         </div>
     </div>
@@ -38,4 +35,4 @@
     <div id='{tabname}_{extra_networks_tabname}_cards' class='extra-network-cards'>
         {items_html}
     </div>
-</div>
+<!-- </div> -->

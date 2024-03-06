@@ -477,6 +477,11 @@ div.toprow-compact-tools{
     padding: 4px;
 }
 
+#settings > div.tab-nav button.selected{
+    color: var(--primary-500);
+    font-weight: bold;
+}
+
 #settings > div.tab-nav .settings-category{
     display: block;
     margin: 1em 0 0.25em 0;
@@ -948,49 +953,49 @@ footer {
     width: auto;
 }
 
-.extra-network-pane .nocards{
+.extra-network-html .nocards{
     margin: 1.25em 0.5em;
     grid-column: 1 / 5;
 }
 
-.extra-network-pane .nocards h1{
+.extra-network-html .nocards h1{
     font-size: 1.5em;
     margin-bottom: 1em;
 }
 
-.extra-network-pane .card .button-row{
+.extra-network-html .card .button-row{
     display: inline-flex;
     visibility: hidden;
     color: white;
 }
 
-.extra-network-pane .card .button-row {
+.extra-network-html .card .button-row {
     position: absolute;
     right: 0;
     z-index: 1;
 }
 
-.extra-network-pane .card:hover .button-row{
+.extra-network-html .card:hover .button-row{
     visibility: visible;
 }
 
-.extra-network-pane .card-button{
+.extra-network-html .card-button{
     color: white;
 }
 
-.extra-network-pane .copy-path-button::before {
+.extra-network-html .copy-path-button::before {
     content: "⎘";
 }
 
-.extra-network-pane .metadata-button::before{
+.extra-network-html .metadata-button::before{
     content: "🛈";
 }
 
-.extra-network-pane .edit-button::before{
+.extra-network-html .edit-button::before{
     content: "🛠";
 }
 
-.extra-network-pane .card-button {
+.extra-network-html .card-button {
     width: 1.5em;
     text-shadow: 2px 2px 3px black;
     color: white;
@@ -998,11 +1003,11 @@ footer {
     font-size: 2rem;
 }
 
-.extra-network-pane .card-button:hover{
+.extra-network-html .card-button:hover{
     color: red;
 }
 
-.extra-network-pane .card-minimal .card-button {
+.extra-network-html .card-minimal .card-button {
     font-size: 1rem;
 }
 
@@ -1027,11 +1032,11 @@ footer {
 }
 
 
-.extra-network-pane .card:hover{
+.extra-network-html .card:hover{
     box-shadow: 0 0 2px .35em var(--primary-700)
 }
 
-.extra-network-pane .card .actions .additional{
+.extra-network-html .card .actions .additional{
     display: none;
     justify-content: center;
     align-items: center;
@@ -1042,7 +1047,7 @@ footer {
     display: flex
 }
 
-.extra-network-pane .card .actions{
+.extra-network-html .card .actions{
     position: absolute;
     bottom: 0;
     left: 0;
@@ -1054,31 +1059,31 @@ footer {
     text-align: center;
 }
 
-.extra-network-pane .card .actions *{
+.extra-network-html .card .actions *{
     color: white;
 }
 
-.extra-network-pane .card .actions .name{
+.extra-network-html .card .actions .name{
     font-size: 1.25em;
     font-weight: 500;
     line-break: anywhere;
 }
 
-.extra-network-pane .card .actions .description {
+.extra-network-html .card .actions .description {
     max-height: 3em;
     white-space: pre-wrap;
     line-height: 1.1;
 }
 
-.extra-network-pane .card .actions .description:hover {
+.extra-network-html .card .actions .description:hover {
     max-height: none;
 }
 
-.extra-network-pane .card .actions:hover .additional{
+.extra-network-html .card .actions:hover .additional{
     display: block;
 }
 
-.extra-network-pane .card .preview{
+.extra-network-html .card .preview{
     position: absolute;
     object-fit: cover;
     width: 100%;
@@ -1197,44 +1202,33 @@ body.resizing .resize-handle {
 }
 
 /* ========================= */
-.extra-network-pane {
+.extra-network-html {
     display: flex;
     height: calc(100vh - 28.5rem);
     resize: vertical;
-    min-height: 60rem;
     flex-direction: column;
     overflow: hidden;
 }
 
 .extra-network-cards {
-    height: calc(100vh - 31rem);
     min-height: 50rem;
-    margin-right: -4px;
+    /* margin-right: -4px; */
     overflow: clip scroll;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     grid-gap: .5em;
 }
-
-.extra-network-pane .extra-network-cards::-webkit-scrollbar {
+/* 
+.extra-network-html .extra-network-cards::-webkit-scrollbar {
     background-color: transparent;
     width: 16px;
 }
 
-.extra-network-pane .extra-network-cards::-webkit-scrollbar-track {
-    background-color: transparent;
-    background-clip: content-box;
-}
-
-.extra-network-pane .extra-network-cards::-webkit-scrollbar-thumb {
+.extra-network-html .extra-network-cards::-webkit-scrollbar-thumb {
     background-color: var(--border-color-primary);
-    border-radius: 16px;
     border: 4px solid var(--background-fill-primary);
-}
-
-.extra-network-pane .extra-network-cards::-webkit-scrollbar-button {
-    display: none;
-}
+    border-radius: 16px;
+} */
 
 .extra-network-control {
     position: relative;
@@ -1285,7 +1279,7 @@ select.extra-network-sort {
     background-color: transparent;
     border-color: var(--button-secondary-border-color);
     border-radius: 8px;
-    padding-right: 1.5rem;
+    padding-right: 2rem;
     margin-left: 0.25em;
     line-height: 1;
 }
@@ -1303,19 +1297,19 @@ option {
 }
 
 .extra-network-control .extra-network-control--sort-dir .extra-network-control--sort-dir-icon {
-    height: 1.5rem;
-    width: 1.5rem;
+    height: 1.75rem;
+    width: 1.75rem;
     mask-repeat: no-repeat;
     mask-position: center center;
     mask-size: 100%;
     background-color: var(--input-placeholder-color);
 }
 
-.extra-network-control .extra-network-control--sort-dir[data-sortdir="Asc"] .extra-network-control--sort-dir-icon {
+.extra-network-control .extra-network-control--sort-dir[data-sortdir="Ascending"] .extra-network-control--sort-dir-icon {
     mask-image: url('data:image/svg+xml,<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M13 12H21M13 8H21M13 16H21M6 7V17M6 7L3 10M6 7L9 10" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></g></svg>');
 }
 
-.extra-network-control .extra-network-control--sort-dir[data-sortdir="Desc"] .extra-network-control--sort-dir-icon {
+.extra-network-control .extra-network-control--sort-dir[data-sortdir="Descending"] .extra-network-control--sort-dir-icon {
     mask-image: url('data:image/svg+xml,<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M13 12H21M13 8H21M13 16H21M6 7V17M6 17L3 14M6 17L9 14" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></g></svg>');
 }
 

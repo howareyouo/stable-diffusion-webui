@@ -16,7 +16,7 @@ from modules.infotext_utils import image_from_url_text
 
 extra_pages = []
 allowed_dirs = set()
-default_allowed_preview_extensions = ["png", "jpg", "jpeg", "webp", "gif"]
+default_allowed_preview_extensions = ["png", "jpg", "jpeg", "webp", "gif", "mp4"]
 
 @functools.cache
 def allowed_preview_extensions_with_extra(extra_extensions=None):
@@ -484,8 +484,8 @@ def create_ui(interface: gr.Blocks, unrelated_tabs, tabname):
             with gr.Column(elem_id=f"{tabname}_{page.extra_networks_tabname}_prompts", elem_classes=["extra-page-prompts"]):
                 pass
 
-            elem_id = f"{tabname}_{page.extra_networks_tabname}_cards_html"
-            page_elem = gr.HTML(page.create_html(tabname, empty=True), elem_id=elem_id)
+            elem_id = f"{tabname}_{page.extra_networks_tabname}_html"
+            page_elem = gr.HTML(page.create_html(tabname, empty=True), elem_id=elem_id, elem_classes="extra-network-html")
             ui.pages.append(page_elem)
             editor = page.create_user_metadata_editor(ui, tabname)
             editor.create_ui()
