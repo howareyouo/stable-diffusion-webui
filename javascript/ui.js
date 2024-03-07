@@ -240,14 +240,12 @@ function setupResolutionPasting(tabname) {
     var width = $(`#${tabname}_width input[type=number]`);
     var height = $(`#${tabname}_height input[type=number]`);
     for (const el of [width, height]) {
-        el.addEventListener('paste', function(event) {
+        el.on('paste', function(event) {
             var pasteData = event.clipboardData.getData('text/plain');
             var parsed = pasteData.match(/^\s*(\d+)\D+(\d+)\s*$/);
             if (parsed) {
-                width.value = parsed[1];
-                height.value = parsed[2];
-                updateInput(width);
-                updateInput(height);
+                updateInput(width, parsed[1]);
+                updateInput(height, parsed[2]);
                 event.preventDefault();
             }
         });

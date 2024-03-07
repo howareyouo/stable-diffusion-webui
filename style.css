@@ -1260,8 +1260,8 @@ body.resizing .resize-handle {
 .extra-network-control::before {
     content: "🔎︎";
     position: absolute;
-    margin: 0.5rem;
-    font-size: 1rem;
+    margin: .5em;
+    font-size: 1.35em;
     color: var(--input-placeholder-color);
 }
 
@@ -1273,10 +1273,10 @@ body.resizing .resize-handle {
 .extra-network-control .extra-network-control-search {
     border: 1px dashed var(--button-secondary-border-color);
     border-bottom: 0;
-    border-radius: 0.5rem;
+    border-radius: 0.5em;
     color: var(--body-text-color);
     background-color: transparent;
-    padding-left: 2rem;
+    padding-left: 2em;
     line-height: 1;
 }
 
@@ -1295,7 +1295,7 @@ body.resizing .resize-handle {
 }
 
 select.extra-network-control-sort {
-    color: var(--body-text-color);
+    color: var(--neutral-400);
     background-color: transparent;
     border: 1px dashed var(--button-secondary-border-color);
     border-radius: 8px;
