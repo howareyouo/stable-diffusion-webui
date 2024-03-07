@@ -3,9 +3,9 @@ import re
 
 from modules import shared, sysinfo
 from modules.paths_internal import script_path, cwd
+from colorama import Fore, Style, init
 
 init(True)
-
 
 def natural_sort_key(s, regex=re.compile('([0-9]+)')):
     return [int(text) if text.isdigit() else text.lower() for text in regex.split(s)]
