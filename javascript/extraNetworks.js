@@ -45,7 +45,7 @@ function setupExtraNetworksForTab(tabname) {
         let sort_mod = $(`#${page.id}_sort`)
         let sort_dir = $(`#${page.id}_sort_dir`)
 
-        let applyFilter = function () {
+        let applyFilter = function (sort) {
             let searchTerm = search.value.toLowerCase()
             let parent = $('.extra-network-cards', page)
             for (let card of parent.children) {
@@ -58,6 +58,7 @@ function setupExtraNetworksForTab(tabname) {
                 card.hidden = visible ? '' : 1
             }
             localSet(search.id, search.value)
+            sort && applySort()
         }
 
         let applySort = function() {
@@ -140,14 +141,14 @@ function extraNetworksUnrelatedTabSelected(tabname) { // called from python when
 function extraNetworksTabSelected(tabname, id, showPrompt, showNegativePrompt, tabname_full) { // called from python when user selects an extra networks tab
     extraNetworksMovePromptToTab(tabname, id, showPrompt, showNegativePrompt);
     extraNetworksShowControlsForPage(tabname, tabname_full);
-    applyExtraNetworkSort(tabname_full)
+    applyExtraNetworkFilter(tabname_full, undefined, 1)
 }
 
-function applyExtraNetworkFilter(tabname_full, subdir) {
+function applyExtraNetworkFilter(tabname_full, subdir, sort) {
     if (subdir != undefined) {
         $(`#${tabname_full}_search`).value = subdir
     }
-    setTimeout(extraNetworksApplyFilter[tabname_full], 1)
+    setTimeout(() => extraNetworksApplyFilter[tabname_full](sort), 1)
 }
 
 function applyExtraNetworkSort(tabname_full) {
@@ -248,23 +249,6 @@ function extraNetworksControlSortDirOnClick(event, tabname, extra_networks_tabna
         el.setAttribute("title", "Sort ascending");
     }
     applyExtraNetworkSort(tabname + "_" + extra_networks_tabname);
-}
-
-
-/**
- * Handles `onclick` events for the Refresh Page button.
- *
- * In order to actually call the python functions in `ui_extra_networks.py`
- * to refresh the page, we created an empty gradio button in that file with an
- * event handler that refreshes the page. So what this function here does
- * is it manually raises a `click` event on that button.
- *
- * @param event                     The generated event.
- * @param tabname                   The name of the active tab in the sd webui. Ex: txt2img, img2img, etc.
- * @param extra_networks_tabname    The id of the active extraNetworks tab. Ex: lora, checkpoints, etc.
- */
-function extraNetworksControlRefreshOnClick(event, tabname, extra_networks_tabname) {
-    _(tabname + "_" + extra_networks_tabname + "_refresh_internal").dispatchEvent(new Event("click"));
 }
 
 let globalPopup, globalPopupBody

@@ -1,29 +1,24 @@
-/* temporary fix to load default gradio font in frontend instead of backend */
-/*@import url('webui-assets/css/sourcesanspro.css');*/
-
-
 /* temporary fix to hide gradio crop tool until it's fixed https://github.com/gradio-app/gradio/issues/3810 */
-
 div.gradio-image button[aria-label="Edit"] {
     display: none;
 }
 
 
 /* general gradio fixes */
-
 :root[lang], .dark {
     --checkbox-label-gap: 0.25em 0.1em;
     --section-header-text-size: 12pt;
     --block-background-fill: transparent;
+    --button-secondary-text-color: var(--neutral-400);
+    --block-title-text-color: var(--neutral-300);
     --input-background-fill: var(--neutral-800);
+    --input-background-fill: #222;
     --body-text-color: var(--neutral-300);
     --tool-button-size: 2.5rem;
     --font: 'Noto Sans';
 }
 
-* {
-    outline: none
-}
+* {outline: none}
 
 .block.padded:not(.gradio-accordion) {
     padding: 0 !important;
@@ -116,11 +111,11 @@ div.compact{
     overflow: hidden;
 }
 
-.gradio-dropdown .token-remove.remove-all.remove-all{
+.gradio-dropdown .token-remove.remove-all{
     display: none;
 }
 
-.gradio-dropdown.multiselect .token-remove.remove-all.remove-all{
+.gradio-dropdown.multiselect .token-remove.remove-all{
     display: flex;
 }
 
@@ -141,7 +136,7 @@ div.gradio-html.min{
 
 .block.gradio-gallery{
     background: var(--input-background-fill);
-    min-height: 768px;
+    height: 812px;
 }
 
 .gradio-container .prose a, .gradio-container .prose a:visited{
@@ -167,27 +162,8 @@ div.gradio-container, .block.gradio-textbox, div.gradio-group, div.gradio-dropdo
 
 /* general styled components */
 
-.gradio-button.tool{
-    border-radius: var(--button-large-radius);
-    padding: var(--button-large-padding);
-    font-weight: var(--button-large-text-weight);
-    background: var(--button-secondary-background-fill);
-    color: var(--button-secondary-text-color);
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    transition: var(--button-transition);
-    box-shadow: var(--button-shadow);
-    cursor: pointer;
-    max-width: var(--tool-button-size);
-    min-width: var(--tool-button-size) !important;
-    height: var(--tool-button-size);
-    align-self: end;
-    line-height: 1;
-    font-size: 1.25em;
-}
-
-button.custom-button{
+button.custom-button,
+.gradio-button.tool {
     border-radius: var(--button-large-radius);
     padding: var(--button-large-padding);
     font-weight: var(--button-large-text-weight);
@@ -207,7 +183,7 @@ button.custom-button{
     height: var(--tool-button-size);
     align-self: end;
     line-height: 1;
-    font-size: 1.25em;
+    font-size: 1.45em;
 }
 
 button.custom-button {
@@ -216,7 +192,7 @@ button.custom-button {
 }
 
 button:hover, .gradio-button:hover, .custom-button:hover {
-    filter: brightness(1.15);
+    filter: brightness(1.25);
 }
 
 button:active, .gradio-button:active, .custom-button:active {
@@ -314,24 +290,25 @@ input[type="checkbox"].input-accordion-checkbox{
 }
 
 .html-log .performance p{
-    display: inline-block;
+    margin: 0;
 }
 
-.html-log .performance p.time, .performance p.vram, .performance p.time abbr, .performance p.vram abbr {
-    margin-bottom: 0;
-    color: var(--block-title-text-color);
+.performance p.time, 
+.performance p.vram, 
+.performance p.time abbr, 
+.performance p.vram abbr {
+    font-weight: bold;
 }
 
-.html-log .performance p.time {
-    color: var(--primary-500);
+.performance p.time {
 }
 
-.html-log .performance p.vram {
+.performance p.vram {
     margin-left: auto;
 }
 
-.html-log .performance .measurement{
-    color: var(--body-text-color);
+.performance .measurement{
+    color: var(--primary-500);
     font-weight: bold;
 }
 
@@ -914,12 +891,12 @@ footer {
 
 #footer{
     text-align: center;
+    display: none;
 }
 
-#footer div{
-    display: inline-block;
+#footer label {
+    font-weight: bold;
 }
-
 #footer .versions{
     font-size: 85%;
     opacity: 0.85;
@@ -985,23 +962,23 @@ footer {
     margin-bottom: 1em;
 }
 
-.extra-network-html .card .button-row{
+.card .button-row{
     display: inline-flex;
     visibility: hidden;
     color: white;
 }
 
-.extra-network-html .card .button-row {
+.card .button-row {
     position: absolute;
     right: 0;
     z-index: 1;
 }
 
-.extra-network-html .card:hover .button-row{
+.card:hover .button-row{
     visibility: visible;
 }
 
-.extra-network-html .card-button{
+.card-button{
     color: white;
 }
 
@@ -1017,7 +994,7 @@ footer {
     content: "🛠";
 }
 
-.extra-network-html .card-button {
+.card-button {
     width: 1.5em;
     text-shadow: 2px 2px 3px black;
     color: white;
@@ -1025,11 +1002,11 @@ footer {
     font-size: 2rem;
 }
 
-.extra-network-html .card-button:hover{
+.card-button:hover{
     color: red;
 }
 
-.extra-network-html .card-minimal .card-button {
+.card-minimal .card-button {
     font-size: 1rem;
 }
 
@@ -1053,23 +1030,11 @@ footer {
     cursor: pointer;
 }
 
-
-.extra-network-html .card:hover{
+.card:hover{
     box-shadow: 0 0 2px .35em var(--primary-700)
 }
 
-.extra-network-html .card .actions .additional{
-    display: none;
-    justify-content: center;
-    align-items: center;
-    font-size: 1.8em;
-}
-
-.extra-network-cards .card .actions:hover .additional {
-    display: flex
-}
-
-.extra-network-html .card .actions{
+.card .actions{
     position: absolute;
     bottom: 0;
     left: 0;
@@ -1081,32 +1046,35 @@ footer {
     text-align: center;
 }
 
-.extra-network-html .card .actions *{
-    color: white;
-}
-
-.extra-network-html .card .actions .name{
+.card .actions .name {
     font-size: 1.25em;
     font-weight: 500;
     line-break: anywhere;
 }
 
-.extra-network-html .card .actions .description {
+.card .actions .description {
     white-space: pre-wrap;
     line-height: 1.1;
     max-height: 3em;
     color: var(--secondary-300);
 }
 
-.extra-network-html .card .actions .description:hover {
+.card .actions .description:hover {
     max-height: none;
 }
 
-.extra-network-html .card .actions:hover .additional{
-    display: block;
+.card .actions .additional {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.85em;
 }
 
-.extra-network-html .card .preview{
+.card .actions:hover .additional {
+    display: flex
+}
+
+.card .preview{
     position: absolute;
     object-fit: cover;
     width: 100%;
@@ -1190,48 +1158,16 @@ div.accordions > div.input-accordion.input-accordion-open{
     top: 0.5em;
 }
 
-body.resizing {
-    cursor: col-resize !important;
-}
-
-body.resizing * {
-    pointer-events: none !important;
-}
-
-body.resizing .resize-handle {
-    pointer-events: initial !important;
-}
-
-.resize-handle {
-    position: relative;
-    cursor: col-resize;
-    grid-column: 2 / 3;
-    min-width: 16px !important;
-    max-width: 16px !important;
-    height: 100%;
-}
-
-.resize-handle::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 7.5px;
-    border-left: 1px dashed var(--border-color-primary);
-}
-
 /* ========================= */
 .extra-network-html {
     display: flex;
-    height: calc(100vh - 28.5rem);
-    resize: vertical;
     flex-direction: column;
+    max-height: calc(100vh - 25rem);
     overflow: hidden;
 }
 
 .extra-network-cards {
     min-height: 50rem;
-    /* margin-right: -4px; */
     overflow: clip scroll;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -1360,10 +1296,12 @@ option {
     background-color: var(--input-placeholder-color);
 }
 
+.extra-network-control label:hover,
 .extra-network-control div:hover {
     filter: brightness(1.5)
 }
 
+.extra-network-control label:active,
 .extra-network-control div:active {
     filter: brightness(1.1) sepia(1)
 }

@@ -172,7 +172,7 @@ class ExtraNetworksPage:
         onclick = item.get("onclick", None)
         if onclick is None:
             # Don't quote prompt/neg_prompt since they are stored as js strings already.
-            onclick_js_tpl = "cardClicked('{tabname}', {prompt}, {neg_prompt}, {allow_neg});"
+            onclick_js_tpl = "cardClicked('{tabname}', {prompt}, {neg_prompt}, {allow_neg})"
             onclick = onclick_js_tpl.format(**{
                 "tabname": tabname,
                 "prompt": item["prompt"],
@@ -466,12 +466,12 @@ def create_ui(interface: gr.Blocks, unrelated_tabs, tabname):
     related_tabs = []
 
     for page in ui.stored_extra_pages:
-        with gr.Tab(page.title, elem_id=f"{tabname}_{page.extra_networks_tabname}", elem_classes=["extra-page"]) as tab:
-            with gr.Column(elem_id=f"{tabname}_{page.extra_networks_tabname}_prompts", elem_classes=["extra-page-prompts"]):
+        tabname_full = tabname + "_" + page.extra_networks_tabname
+        with gr.Tab(page.title, elem_id=tabname_full, elem_classes=["extra-page"]) as tab:
+            with gr.Column(elem_id=f"{tabname_full}_prompts", elem_classes=["extra-page-prompts"]):
                 pass
 
-            elem_id = f"{tabname}_{page.extra_networks_tabname}_html"
-            page_elem = gr.HTML(page.create_html(tabname, empty=True), elem_id=elem_id, elem_classes="extra-network-html")
+            page_elem = gr.HTML(page.create_html(tabname, empty=True), elem_id=f"{tabname_full}_html", elem_classes="extra-network-html")
             ui.pages.append(page_elem)
             editor = page.create_user_metadata_editor(ui, tabname)
             editor.create_ui()
@@ -482,16 +482,13 @@ def create_ui(interface: gr.Blocks, unrelated_tabs, tabname):
     ui.preview_target_filename = gr.Textbox('Preview save filename', elem_id=f"{tabname}_preview_filename", visible=False)
 
     for tab in unrelated_tabs:
-        tab.select(fn=None, _js=f"function(){{extraNetworksUnrelatedTabSelected('{tabname}');}}", inputs=[], outputs=[], show_progress=False)
+        tab.select(fn=None, _js=f"() => extraNetworksUnrelatedTabSelected('{tabname}')", show_progress=False)
 
     for page, tab in zip(ui.stored_extra_pages, related_tabs):
-        jscode = (
-            "function(){{"
-            f"extraNetworksTabSelected('{tabname}', '{tabname}_{page.extra_networks_tabname}_prompts', {str(page.allow_prompt).lower()}, {str(page.allow_negative_prompt).lower()}, '{tabname}_{page.extra_networks_tabname}');"
-            f"applyExtraNetworkFilter('{tabname}_{page.extra_networks_tabname}');"
-            "}}"
-        )
-        tab.select(fn=None, _js=jscode, inputs=[], outputs=[], show_progress=False)
+        tabname_full = tabname + "_" + page.extra_networks_tabname
+        jscode = f"() => extraNetworksTabSelected('{tabname}', '{tabname_full}_prompts', {str(page.allow_prompt).lower()}, {str(page.allow_negative_prompt).lower()}, '{tabname_full}')"
+        
+        tab.select(fn=None, _js=jscode, show_progress=False)
 
         def refresh():
             for pg in ui.stored_extra_pages:
@@ -499,8 +496,8 @@ def create_ui(interface: gr.Blocks, unrelated_tabs, tabname):
             create_html()
             return ui.pages_contents
 
-        button_refresh = gr.Button("Refresh", elem_id=f"{tabname}_{page.extra_networks_tabname}_refresh_internal", visible=False)
-        button_refresh.click(fn=refresh, inputs=[], outputs=ui.pages).then(fn=lambda: None, _js=f"() => applyExtraNetworkFilter('{tabname}_{page.extra_networks_tabname}')")
+        button_refresh = gr.Button("Refresh", elem_id=f"{tabname_full}_refresh_internal", visible=False)
+        button_refresh.click(fn=refresh, outputs=ui.pages).then(fn=lambda: None, _js=f"() => applyExtraNetworkFilter('{tabname_full}')")
 
     def create_html():
         ui.pages_contents = [pg.create_html(ui.tabname) for pg in ui.stored_extra_pages]
@@ -510,7 +507,7 @@ def create_ui(interface: gr.Blocks, unrelated_tabs, tabname):
             create_html()
         return ui.pages_contents
 
-    interface.load(fn=pages_html, inputs=[], outputs=ui.pages)
+    interface.load(fn=pages_html, outputs=ui.pages)
 
     return ui
 
