@@ -35,7 +35,7 @@ onAfterUiUpdate(function() {
     if (document.hasFocus()) return;
 
     // Multiple copies of the images are in the DOM when one is selected. Dedup with a Set to get the real number generated.
-    const imgs = new Set(galleryPreviews).map(img => img.src);
+    const imgs = new Set(galleryPreviews.map(img => img.src));
 
     const notification = new Notification(
         'Stable Diffusion',

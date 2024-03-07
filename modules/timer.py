@@ -1,5 +1,6 @@
 import time
 import argparse
+from colorama import Fore, Style, init
 
 
 class TimerSubcategory:
@@ -63,14 +64,13 @@ class Timer:
         return subcat
 
     def summary(self):
-        res = f"{self.total:.1f}s"
+        res = f"{Fore.LIGHTYELLOW_EX}{self.total:.1f}s{Fore.RESET}"
 
         additions = [(category, time_taken) for category, time_taken in self.records.items() if time_taken >= 0.1 and '/' not in category]
         if not additions:
             return res
-
         res += " ("
-        res += ", ".join([f"{category}: {time_taken:.1f}s" for category, time_taken in additions])
+        res += ", ".join([f"{category}: {Fore.LIGHTWHITE_EX}{time_taken:.1f}s{Fore.RESET}" for category, time_taken in additions])
         res += ")"
 
         return res

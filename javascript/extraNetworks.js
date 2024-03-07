@@ -166,37 +166,37 @@ let re_extranet_g_neg = /\(([^:^>]+:[\d.]+)\)/g
 
 function tryToRemoveExtraNetworkFromPrompt(textarea, text, isNeg) {
     let m = text.match(isNeg ? re_extranet_neg : re_extranet)
+    let extraTextSep = opts.extra_networks_add_text_separator
     let replaced = false
-    let newTextareaText
-    let extraTextSeparator = opts.extra_networks_add_text_separator
+    let newValue
     if (m) {
         let extraTextAfterNet = m[2]
         let partToSearch = m[1]
-        let foundAtPosition = -1
-        newTextareaText = textarea.value.replaceAll(isNeg ? re_extranet_g_neg : re_extranet_g, function(found, net, pos) {
+        let foundPos = -1
+        newValue = textarea.value.replaceAll(isNeg ? re_extranet_g_neg : re_extranet_g, function(found, net, pos) {
             m = found.match(isNeg ? re_extranet_neg : re_extranet);
             if (m[1] == partToSearch) {
                 replaced = true;
-                foundAtPosition = pos;
+                foundPos = pos;
                 return "";
             }
             return found;
         });
-        if (foundAtPosition >= 0) {
-            if (extraTextAfterNet && newTextareaText.substr(foundAtPosition, extraTextAfterNet.length) == extraTextAfterNet) {
-                newTextareaText = newTextareaText.substr(0, foundAtPosition) + newTextareaText.substr(foundAtPosition + extraTextAfterNet.length);
+        if (foundPos >= 0) {
+            if (extraTextAfterNet && newValue.substr(foundPos, extraTextAfterNet.length) == extraTextAfterNet) {
+                newValue = newValue.substr(0, foundPos) + newValue.substr(foundPos + extraTextAfterNet.length);
             }
-            if (newTextareaText.substr(foundAtPosition - extraTextSeparator.length, extraTextSeparator.length) == extraTextSeparator) {
-                newTextareaText = newTextareaText.substr(0, foundAtPosition - extraTextSeparator.length) + newTextareaText.substr(foundAtPosition);
+            if (newValue.substr(foundPos - extraTextSep.length, extraTextSep.length) == extraTextSep) {
+                newValue = newValue.substr(0, foundPos - extraTextSep.length) + newValue.substr(foundPos);
             }
         }
     } else {
-        newTextareaText = textarea.value.replaceAll(new RegExp(`((?:${extraTextSeparator})?${text})`, "g"), "");
-        replaced = (newTextareaText != textarea.value);
+        newValue = textarea.value.replaceAll(new RegExp(`((?:${extraTextSep})?${text})`, "g"), "");
+        replaced = (newValue != textarea.value)
     }
 
     if (replaced) {
-        textarea.value = newTextareaText;
+        textarea.value = newValue;
         return true;
     }
 
@@ -205,10 +205,11 @@ function tryToRemoveExtraNetworkFromPrompt(textarea, text, isNeg) {
 
 function updatePromptArea(text, textarea, isNeg) {
     if (!tryToRemoveExtraNetworkFromPrompt(textarea, text, isNeg)) {
-        textarea.value = textarea.value + opts.extra_networks_add_text_separator + text
+        let add = trim(opts.extra_networks_add_text_separator)
+        textarea.value += textarea.value.endsWith(add) ? '' : add
     }
 
-    updateInput(textarea);
+    updateInput(textarea)
 }
 
 function cardClicked(tabname, textToAdd, textToAddNegative, allowNegativePrompt) {

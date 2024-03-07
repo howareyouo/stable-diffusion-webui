@@ -248,7 +248,6 @@ class ExtraNetworksPage:
             "search_only": " search_only" if search_only else "",
             "search_terms": search_terms_html,
             "sort_keys": sort_keys,
-            "style": card_style,
             "tabname": tabname,
             "extra_networks_tabname": self.extra_networks_tabname,
         }

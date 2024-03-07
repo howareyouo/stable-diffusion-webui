@@ -13,7 +13,7 @@ import ldm.modules.midas as midas
 
 from ldm.util import instantiate_from_config
 
-from modules import paths, shared, modelloader, devices, script_callbacks, sd_vae, sd_disable_initialization, errors, hashes, sd_models_config, sd_unet, sd_models_xl, cache, extra_networks, processing, lowvram, sd_hijack, patches
+from modules import paths, shared, modelloader, devices, script_callbacks, sd_vae, sd_disable_initialization, errors, hashes, sd_models_config, sd_unet, sd_models_xl, cache, extra_networks, processing, lowvram, sd_hijack, patches, util
 from modules.timer import Timer
 from modules.shared import opts
 import tomesd
@@ -318,7 +318,7 @@ def read_state_dict(checkpoint_file, print_global_state=False, map_location=None
 
 def get_checkpoint_state_dict(checkpoint_info: CheckpointInfo, timer):
     sd_model_hash = checkpoint_info.calculate_shorthash()
-    timer.record("calculate hash")
+    timer.record("hashing")
 
     if checkpoint_info in checkpoints_loaded:
         # use checkpoint cache
@@ -327,9 +327,10 @@ def get_checkpoint_state_dict(checkpoint_info: CheckpointInfo, timer):
         checkpoints_loaded.move_to_end(checkpoint_info)
         return checkpoints_loaded[checkpoint_info]
 
-    print(f"Loading weights [{sd_model_hash}] from {checkpoint_info.filename}")
+    print(f"Loading weights [{sd_model_hash}] from {util.shortern(checkpoint_info.filename)}")
     res = read_state_dict(checkpoint_info.filename)
-    timer.record("load weights from disk")
+    # timer.record("load weights from disk")
+    timer.record("load weights")
 
     return res
 
@@ -818,7 +819,7 @@ def reuse_model_from_already_loaded(sd_model, checkpoint_info, timer):
         sd_vae.reload_vae_weights(already_loaded)
         return model_data.sd_model
     elif shared.opts.sd_checkpoints_limit > 1 and len(model_data.loaded_sd_models) < shared.opts.sd_checkpoints_limit:
-        print(f"Loading model {checkpoint_info.title} ({len(model_data.loaded_sd_models) + 1} out of {shared.opts.sd_checkpoints_limit})")
+        print(f"Loading model {util.y(checkpoint_info.title)} ({len(model_data.loaded_sd_models) + 1} out of {shared.opts.sd_checkpoints_limit})")
 
         model_data.sd_model = None
         load_model(checkpoint_info)

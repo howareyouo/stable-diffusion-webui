@@ -4,6 +4,8 @@ import re
 from modules import shared, sysinfo
 from modules.paths_internal import script_path, cwd
 
+init(True)
+
 
 def natural_sort_key(s, regex=re.compile('([0-9]+)')):
     return [int(text) if text.isdigit() else text.lower() for text in regex.split(s)]
@@ -14,8 +16,23 @@ def listfiles(dirname):
     return [file for file in filenames if os.path.isfile(file)]
 
 
+def g(text):
+    return Fore.GREEN + text + Style.RESET
+
+def gg(text):
+    return Style.DIM + Fore.LIGHTGREEN_EX + text + Style.RESET_ALL
+
+def y(text):
+    return Fore.YELLOW + text + Fore.RESET
+
+def yy(text):
+    return Style.DIM + Fore.LIGHTYELLOW_EX + text + Style.RESET_ALL
+
 def html_path(filename):
     return os.path.join(script_path, "html", filename)
+
+def shortern(filename):
+    return y(os.path.relpath(filename, "models"))
 
 
 def html(filename):

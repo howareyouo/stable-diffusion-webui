@@ -1,12 +1,11 @@
 import hashlib
 import os.path
 
-from modules import shared
+from modules import shared, util
 import modules.cache
 
 dump_cache = modules.cache.dump_cache
 cache = modules.cache.cache
-
 
 def calculate_sha256(filename):
     hash_sha256 = hashlib.sha256()
@@ -47,14 +46,14 @@ def sha256(filename, title, use_addnet_hash=False):
 
     if shared.cmd_opts.no_hashing:
         return None
-
-    print(f"Calculating sha256 for {filename}: ", end='')
+ 
+    print(f"Calc sha256 for {util.shortern(filename)}: ", end='')
     if use_addnet_hash:
         with open(filename, "rb") as file:
             sha256_value = addnet_hash_safetensors(file)
     else:
         sha256_value = calculate_sha256(filename)
-    print(f"{sha256_value}")
+    print(f"[{sha256_value[:10]}]")
 
     hashes[title] = {
         "mtime": os.path.getmtime(filename),

@@ -191,16 +191,28 @@ button.custom-button{
     border-radius: var(--button-large-radius);
     padding: var(--button-large-padding);
     font-weight: var(--button-large-text-weight);
-    border: var(--button-border-width) solid var(--button-secondary-border-color);
-    background: var(--button-secondary-background-fill);
+    background: var(--neutral-700);
     color: var(--button-secondary-text-color);
-    font-size: var(--button-large-text-size);
     display: inline-flex;
     justify-content: center;
     align-items: center;
     transition: var(--button-transition);
     box-shadow: var(--button-shadow);
-    text-align: center;
+    cursor: pointer;
+}
+
+.gradio-button.tool {
+    max-width: var(--tool-button-size);
+    min-width: var(--tool-button-size) !important;
+    height: var(--tool-button-size);
+    align-self: end;
+    line-height: 1;
+    font-size: 1.25em;
+}
+
+button.custom-button {
+    border: var(--button-border-width) solid var(--button-secondary-border-color);
+    font-size: var(--button-large-text-size);
 }
 
 button:hover, .gradio-button:hover, .custom-button:hover {
