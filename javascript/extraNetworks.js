@@ -20,89 +20,80 @@ function formatPrompt (textarea) {
     textarea.value = text
 }
 
-function registerPrompt(tabname, id) {
-    let textarea = $(`#${id} textarea`)
-
-    if (!activePromptTextarea[tabname]) {
-        activePromptTextarea[tabname] = textarea
-    }
-
-    textarea.on('focus', function() {
-        activePromptTextarea[tabname] = textarea
-    });
-
-    textarea.on('blur', () => {
-        textarea.start = textarea.selectionStart
-        textarea.end = textarea.selectionEnd
-
-        formatPrompt(textarea)
-        updateInput(textarea)
-
-        textarea.setSelectionRange(textarea.start, textarea.end)
-    })
-}
-
 function setupExtraNetworksForTab(tabname) {
     let tabnav = $(`#${tabname}_extra_tabs > .tab-nav`)
-    let controlsDiv = createEl('div', 'extra-networks-controls-div', '', tabnav);
+
+    function registerPrompt(tabname, id) {
+        let textarea = $(`#${id} textarea`)
+        if (!activePromptTextarea[tabname]) {
+            activePromptTextarea[tabname] = textarea
+        }
+        textarea.on('focus', function() {
+            activePromptTextarea[tabname] = textarea
+        })
+        textarea.on('blur', () => {
+            textarea.start = textarea.selectionStart
+            textarea.end = textarea.selectionEnd
+            formatPrompt(textarea)
+            updateInput(textarea)
+            textarea.setSelectionRange(textarea.start, textarea.end)
+        })
+    }
 
     $$(`#${tabname}_extra_tabs .extra-page`).forEach(function(page) {
-        let search = $(`#${page.id}_extra_search`)
-        let sort_mode = $('.extra-network-sort', page)
-        let sort_dir = $(`#${page.id}_extra_sort_dir`)
-        
-        let applyFilter = function (force) {
+        let search = $(`#${page.id}_search`)
+        let sort_mod = $(`#${page.id}_sort`)
+        let sort_dir = $(`#${page.id}_sort_dir`)
+
+        let applyFilter = function () {
             let searchTerm = search.value.toLowerCase()
             let parent = $('.extra-network-cards', page)
-            for (let elem of parent.children) {
-                let searchOnly = elem.querySelector('.search_only')
-                let text = Array.prototype.map.call(elem.querySelectorAll('.search_terms'), function (t) {
-                    return t.textContent.toLowerCase()
-                }).join(' ')
-
-                let visible = text.indexOf(searchTerm) != -1
+            for (let card of parent.children) {
+                let searchOnly = card.querySelector('.search_only')
+                let text = $$('.search_terms', card).map(t => t.textContent).join(' ').toLowerCase()
+                let visible = text.includes(searchTerm)
                 if (searchOnly && searchTerm.length < 4) {
                     visible = false
                 }
-                elem.style.display = visible ? '' : 'none'
+                card.hidden = visible ? '' : 1
             }
-
-            applySort(force)
+            localSet(search.id, search.value)
         }
 
-        let applySort = function(force) {
+        let applySort = function() {
             let reverse = sort_dir.dataset.sortdir == 'Descending'
-            let sortKey = "sort" + sort_mode.value
+            let sortKey = "sort" + sort_mod.value
             let parent = $('.extra-network-cards', page)
             let sorted = Array.from(parent.children)
             sorted.sort(function(cardA, cardB) {
                 let a = cardA.dataset[sortKey]
                 let b = cardB.dataset[sortKey]
-                let res
-                if (isNaN(a) || isNaN(b))
-                    res = a.localeCompare(b)
-                else
-                    res = a - b
+                let res = isNaN(a) || isNaN(b) ? a.localeCompare(b) : a - b
                 return reverse ? -res : res
             })
-
             let frag = document.createDocumentFragment()
             sorted.forEach(el => frag.appendChild(el))
             parent.replaceChildren(frag)
-        };
+            localSet(sort_mod.id, sort_mod.value)
+            localSet(sort_dir.id, sort_dir.dataset.sortdir)
+        }
 
-        search.addEventListener("input", applyFilter);
-        applySort();
-        applyFilter();
-        extraNetworksApplySort[page.id] = applySort;
+        search.value = localGet(search.id)
+        sort_mod.value = localGet(sort_mod.id)
+        sort_dir.dataset.sortdir = localGet(sort_dir.id)
+
+        search.on("input", applyFilter);
         extraNetworksApplyFilter[page.id] = applyFilter;
+        extraNetworksApplySort[page.id] = applySort;
 
-        controlsDiv.appendChild($(`#${page.id}_controls`))
+        let controls = $('.extra-network-control', page)
+        tabnav.append(controls)
+        // controls.remove()
 
         if (page.style.display != "none") {
             extraNetworksShowControlsForPage(tabname, page.id)
         }
-    });
+    })
 
     registerPrompt(tabname, tabname + "_prompt");
     registerPrompt(tabname, tabname + "_neg_prompt");
@@ -135,10 +126,9 @@ function extraNetworksMovePromptToTab(tabname, id, showPrompt, showNegativePromp
 
 
 function extraNetworksShowControlsForPage(tabname, tabname_full) {
-    $$('#' + tabname + '_extra_tabs .extra-networks-controls-div > div').forEach(function(elem) {
-        let targetId = tabname_full + '_controls'
-        elem.style.display = elem.id == targetId ? "" : "none";
-    });
+    $$(`#${tabname}_extra_tabs > .tab-nav > .extra-network-control`).forEach(function(el) {
+        el.hidden = el.classList.contains(tabname_full) ? '' : '1'
+    })
 }
 
 
@@ -150,27 +140,23 @@ function extraNetworksUnrelatedTabSelected(tabname) { // called from python when
 function extraNetworksTabSelected(tabname, id, showPrompt, showNegativePrompt, tabname_full) { // called from python when user selects an extra networks tab
     extraNetworksMovePromptToTab(tabname, id, showPrompt, showNegativePrompt);
     extraNetworksShowControlsForPage(tabname, tabname_full);
+    applyExtraNetworkSort(tabname_full)
 }
 
 function applyExtraNetworkFilter(tabname_full, subdir) {
     if (subdir != undefined) {
-        $(`#${tabname_full}_extra_search`).value = subdir
+        $(`#${tabname_full}_search`).value = subdir
     }
-    setTimeout(() => extraNetworksApplyFilter[tabname_full](true), 1)
+    setTimeout(extraNetworksApplyFilter[tabname_full], 1)
 }
 
 function applyExtraNetworkSort(tabname_full) {
-    setTimeout(() => extraNetworksApplySort[tabname_full](true), 1)
+    setTimeout(extraNetworksApplySort[tabname_full], 1)
 }
 
 let extraNetworksApplyFilter = {};
 let extraNetworksApplySort = {};
 let activePromptTextarea = {};
-
-function setupExtraNetworks() {
-    setupExtraNetworksForTab('txt2img');
-    setupExtraNetworksForTab('img2img');
-}
 
 let re_extranet = /<([^:^>]+:[^:]+):[\d.]+>(.*)/
 let re_extranet_g = /<([^:^>]+:[^:]+):[\d.]+>/g
@@ -252,16 +238,6 @@ function saveCardPreview(event, tabname, filename) {
 }
 
 function extraNetworksControlSortDirOnClick(event, tabname, extra_networks_tabname) {
-    /**
-     * Handles `onclick` events for the Sort Direction button.
-     *
-     * Modifies the data attributes of the Sort Direction button to cycle between
-     * ascending and descending sort directions.
-     *
-     * @param event                     The generated event.
-     * @param tabname                   The name of the active tab in the sd webui. Ex: txt2img, img2img, etc.
-     * @param extra_networks_tabname    The id of the active extraNetworks tab. Ex: lora, checkpoints, etc.
-     */
     let el = event.currentTarget
     if (el.dataset.sortdir == "Ascending") {
         el.dataset.sortdir = "Descending";
@@ -274,52 +250,45 @@ function extraNetworksControlSortDirOnClick(event, tabname, extra_networks_tabna
 }
 
 
+/**
+ * Handles `onclick` events for the Refresh Page button.
+ *
+ * In order to actually call the python functions in `ui_extra_networks.py`
+ * to refresh the page, we created an empty gradio button in that file with an
+ * event handler that refreshes the page. So what this function here does
+ * is it manually raises a `click` event on that button.
+ *
+ * @param event                     The generated event.
+ * @param tabname                   The name of the active tab in the sd webui. Ex: txt2img, img2img, etc.
+ * @param extra_networks_tabname    The id of the active extraNetworks tab. Ex: lora, checkpoints, etc.
+ */
 function extraNetworksControlRefreshOnClick(event, tabname, extra_networks_tabname) {
-    /**
-     * Handles `onclick` events for the Refresh Page button.
-     *
-     * In order to actually call the python functions in `ui_extra_networks.py`
-     * to refresh the page, we created an empty gradio button in that file with an
-     * event handler that refreshes the page. So what this function here does
-     * is it manually raises a `click` event on that button.
-     *
-     * @param event                     The generated event.
-     * @param tabname                   The name of the active tab in the sd webui. Ex: txt2img, img2img, etc.
-     * @param extra_networks_tabname    The id of the active extraNetworks tab. Ex: lora, checkpoints, etc.
-     */
-    _(tabname + "_" + extra_networks_tabname + "_extra_refresh_internal").dispatchEvent(new Event("click"));
+    _(tabname + "_" + extra_networks_tabname + "_refresh_internal").dispatchEvent(new Event("click"));
 }
 
-let globalPopup = null
-let globalPopupInner = null
+let globalPopup, globalPopupBody
 
-function closePopup() {
-    if (!globalPopup) return;
-    globalPopup.style.display = "none";
+function closePopup () {
+    if (!globalPopup) return
+    globalPopup.style.display = 'none'
 }
 
-function popup(contents) {
+function popup (elem) {
     if (!globalPopup) {
-        globalPopup = document.createElement('div');
-        globalPopup.classList.add('global-popup');
+        globalPopup = createEl('div', 'global-popup', {onclick: closePopup}, $('.main'))
 
-        let close = document.createElement('div')
-        close.classList.add('global-popup-close');
-        close.addEventListener("click", closePopup);
-        close.title = "Close";
-        globalPopup.appendChild(close);
+        createEl('div', 'global-popup-close', {onclick: closePopup, title: 'Close'}, globalPopup)
 
-        globalPopupInner = document.createElement('div');
-        globalPopupInner.classList.add('global-popup-inner');
-        globalPopup.appendChild(globalPopupInner);
-
-        $('.main').appendChild(globalPopup);
+        globalPopupBody = createEl('div', 'global-popup-inner', {
+            onclick: e => {
+                e.stopPropagation()
+                return false
+            }, title: 'Close'
+        }, globalPopup)
     }
-
-    globalPopupInner.innerHTML = '';
-    globalPopupInner.appendChild(contents);
-
-    globalPopup.style.display = "flex";
+    globalPopupBody.innerHTML = ''
+    globalPopupBody.appendChild(elem)
+    globalPopup.style.display = 'flex'
 }
 
 let storedPopupIds = {}
@@ -328,41 +297,32 @@ function popupId(id) {
     if (!storedPopupIds[id]) {
         storedPopupIds[id] = _(id);
     }
-
     popup(storedPopupIds[id]);
 }
 
-function extraNetworksShowMetadata(text) {
-    let elem = document.createElement('pre')
-    elem.classList.add('popup-metadata');
-    elem.textContent = text;
-
-    popup(elem);
+function extraNetworksShowMetadata (textContent) {
+    let elem = createEl('pre', 'popup-metadata', {textContent})
+    popup(elem)
 }
 
-function requestGet(url, data, handler, errorHandler) {
+function requestGet (url, data, handler, errorHandler) {
     let xhr = new XMLHttpRequest()
-    let args = Object.keys(data).map(function (k) {
-        return encodeURIComponent(k) + '=' + encodeURIComponent(data[k])
-    }).join('&')
-    xhr.open("GET", url + "?" + args, true);
-
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4) {
-            if (xhr.status === 200) {
-                try {
-                    let js = JSON.parse(xhr.responseText)
-                    handler(js);
-                } catch (error) {
-                    console.error(error);
-                    errorHandler();
-                }
-            } else {
-                errorHandler();
+    xhr.open('GET', url + '?' + new URLSearchParams(data), true)
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState !== 4) return
+        if (xhr.status === 200) {
+            try {
+                let js = JSON.parse(xhr.responseText)
+                handler(js)
+            } catch (error) {
+                console.error(error)
+                errorHandler()
             }
+        } else {
+            errorHandler()
         }
-    };
-    xhr.send(JSON.stringify(data))
+    }
+    xhr.send()
 }
 
 function extraNetworksCopyCardPath(event, path) {
@@ -423,46 +383,10 @@ function extraNetworksRefreshSingleCard(page, tabname, name) {
             card.parentElement.insertBefore(newCard, card);
             card.parentElement.removeChild(card);
         }
-    });
-}
-
-window.addEventListener("keydown", function(event) {
-    if (event.key == "Escape") {
-        closePopup();
-    }
-});
-
-/**
- * Setup custom loading for this script.
- * We need to wait for all of our HTML to be generated in the extra networks tabs
- * before we can actually run the `setupExtraNetworks` function.
- * The `onUiLoaded` function actually runs before all of our extra network tabs are
- * finished generating. Thus we needed this new method.
- *
- */
-let uiAfterScriptsCallbacks = []
-let uiAfterScriptsTimeout = null
-let executedAfterScripts = false
-
-function scheduleAfterScriptsCallbacks() {
-    clearTimeout(uiAfterScriptsTimeout);
-    uiAfterScriptsTimeout = setTimeout(function() {
-        executeCallbacks(uiAfterScriptsCallbacks);
-    }, 200);
+    })
 }
 
 onUiLoaded(function() {
-    let mutationObserver = new MutationObserver(function (m) {
-        let existingSearchfields = $$('[id$=\'_extra_search\']').length
-        let neededSearchfields = $$('[id$=\'_extra_tabs\'] > .tab-nav > button').length - 2
-
-        if (!executedAfterScripts && existingSearchfields >= neededSearchfields) {
-            mutationObserver.disconnect()
-            executedAfterScripts = true
-            scheduleAfterScriptsCallbacks()
-        }
-    })
-    mutationObserver.observe(gradioApp(), {childList: true, subtree: true});
-});
-
-uiAfterScriptsCallbacks.push(setupExtraNetworks);
+    setupExtraNetworksForTab('txt2img')
+    setupExtraNetworksForTab('img2img')
+})

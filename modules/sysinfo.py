@@ -48,12 +48,18 @@ def hr_size(filepath:str) -> str:
     stat = os.stat(filepath)
     return pretty_bytes(stat.st_size)
 
-def pretty_bytes(num, suffix="B"):
+def _pretty_bytes(num, suffix="B"):
     for unit in ["", "K", "M", "G", "T", "P", "E", "Z", "Y"]:
         if abs(num) < 1024 or unit == 'Y':
             return f"{num:.2f}{unit}{suffix}"
         num /= 1024
 
+def pretty_bytes(size, decimal_places=2):
+    for unit in ['B', 'KB', 'MB', 'GB', 'TB', 'PB']:
+        if size < 1024.0 or unit == 'PB':
+            break
+        size /= 1024.0
+    return f"{size:.{decimal_places}f} {unit}"
 
 def get():
     res = get_dict()

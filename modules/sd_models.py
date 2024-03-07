@@ -392,7 +392,7 @@ def load_model_weights(model, checkpoint_info: CheckpointInfo, state_dict, timer
         checkpoints_loaded[checkpoint_info] = state_dict.copy()
 
     model.load_state_dict(state_dict, strict=False)
-    timer.record("apply weights to model")
+    timer.record("apply weights")
 
     del state_dict
 
@@ -762,7 +762,7 @@ def load_model(checkpoint_info=None, already_loaded_state_dict=None):
 
     sd_hijack.model_hijack.embedding_db.load_textual_inversion_embeddings(force_reload=True)  # Reload embeddings after model load as they may or may not fit the model
 
-    timer.record("load textual inversion embeddings")
+    timer.record("load embeddings")
 
     script_callbacks.model_loaded_callback(sd_model)
 
@@ -798,15 +798,15 @@ def reuse_model_from_already_loaded(sd_model, checkpoint_info, timer):
             print(f"Unloading model {len(model_data.loaded_sd_models)} over the limit of {shared.opts.sd_checkpoints_limit}: {loaded_model.sd_checkpoint_info.title}")
             model_data.loaded_sd_models.pop()
             send_model_to_trash(loaded_model)
-            timer.record("send model to trash")
+            timer.record("send to trash")
 
         if shared.opts.sd_checkpoints_keep_in_cpu:
             send_model_to_cpu(sd_model)
-            timer.record("send model to cpu")
+            timer.record("send to cpu")
 
     if already_loaded is not None:
         send_model_to_device(already_loaded)
-        timer.record("send model to device")
+        timer.record("send to device")
 
         model_data.set_sd_model(already_loaded, already_loaded=True)
 
@@ -814,7 +814,7 @@ def reuse_model_from_already_loaded(sd_model, checkpoint_info, timer):
             shared.opts.data["sd_model_checkpoint"] = already_loaded.sd_checkpoint_info.title
             shared.opts.data["sd_checkpoint_hash"] = already_loaded.sd_checkpoint_info.sha256
 
-        print(f"Using already loaded model {already_loaded.sd_checkpoint_info.title}: done in {timer.summary()}")
+        print(f"Using loaded model {already_loaded.sd_checkpoint_info.title}: done in {timer.summary()}")
         sd_vae.reload_vae_weights(already_loaded)
         return model_data.sd_model
     elif shared.opts.sd_checkpoints_limit > 1 and len(model_data.loaded_sd_models) < shared.opts.sd_checkpoints_limit:

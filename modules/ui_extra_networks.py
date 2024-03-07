@@ -133,7 +133,7 @@ class ExtraNetworksPage:
 
     def link_preview(self, filename):
         quoted_filename = urllib.parse.quote(filename.replace('\\', '/'))
-        mtime, _ = self.lister.mctime(filename)
+        mtime, c, s = self.lister.mctime(filename)
         return f"./sd_extra_networks/thumb?filename={quoted_filename}&mtime={mtime}"
 
     def search_terms_from_path(self, filename, possible_directories=None):
@@ -161,44 +161,44 @@ class ExtraNetworksPage:
                 Can be empty if the item is not meant to be shown.
             If no template is passed: A dictionary containing the generated item's attributes.
         """
-        preview = item.get("preview", None)
         style_height = f"height: {shared.opts.extra_networks_card_height}px;" if shared.opts.extra_networks_card_height else ''
         style_width = f"width: {shared.opts.extra_networks_card_width}px;" if shared.opts.extra_networks_card_width else ''
         style_font_size = f"font-size: {shared.opts.extra_networks_card_text_scale*100}%;"
         card_style = style_height + style_width + style_font_size
-        background_image = f'<img src="{html.escape(preview)}" class="preview" loading="lazy">' if preview else ''
+        preview = item.get("preview", None)
+        
+        background_image = ''
+        if preview:
+            if preview.split('&')[0].endswith('.mp4'):
+                background_image = f'<video src="{html.escape(preview)}" class="preview" autoplay loop muted></video>'
+            else:
+                background_image = f'<img src="{html.escape(preview)}" class="preview" loading="lazy">'
 
         onclick = item.get("onclick", None)
         if onclick is None:
             # Don't quote prompt/neg_prompt since they are stored as js strings already.
             onclick_js_tpl = "cardClicked('{tabname}', {prompt}, {neg_prompt}, {allow_neg});"
-            onclick = onclick_js_tpl.format(
-                **{
-                    "tabname": tabname,
-                    "prompt": item["prompt"],
-                    "neg_prompt": item.get("negative_prompt", "''"),
-                    "allow_neg": str(self.allow_negative_prompt).lower(),
-                }
-            )
+            onclick = onclick_js_tpl.format(**{
+                "tabname": tabname,
+                "prompt": item["prompt"],
+                "neg_prompt": item.get("negative_prompt", "''"),
+                "allow_neg": str(self.allow_negative_prompt).lower(),
+            })
             onclick = html.escape(onclick)
 
         btn_copy_path = self.btn_copy_path_tpl.format(**{"filename": item["filename"]})
         btn_metadata = ""
         metadata = item.get("metadata")
         if metadata:
-            btn_metadata = self.btn_metadata_tpl.format(
-                **{
-                    "extra_networks_tabname": self.extra_networks_tabname,
-                    "name": html.escape(item["name"]),
-                }
-            )
-        btn_edit_item = self.btn_edit_item_tpl.format(
-            **{
-                "tabname": tabname,
+            btn_metadata = self.btn_metadata_tpl.format(**{
                 "extra_networks_tabname": self.extra_networks_tabname,
                 "name": html.escape(item["name"]),
-            }
-        )
+            })
+        btn_edit_item = self.btn_edit_item_tpl.format(**{
+            "tabname": tabname,
+            "extra_networks_tabname": self.extra_networks_tabname,
+            "name": html.escape(item["name"]),
+        })
 
         local_path = ""
         filename = item.get("filename", "")
@@ -218,22 +218,14 @@ class ExtraNetworksPage:
         if search_only and shared.opts.extra_networks_hidden_models == "Never":
             return ""
 
-        sort_keys = " ".join(
-            [
-                f'data-sort-{k}="{html.escape(str(v))}"'
-                for k, v in item.get("sort_keys", {}).items()
-            ]
-        ).strip()
+        sort_keys = " ".join([
+            f'data-sort-{k}="{html.escape(str(v))}"'
+            for k, v in item.get("sort_keys", {}).items()
+        ]).strip()
 
         search_terms_html = ""
-        search_term_template = "<span class='hidden {class}'>{search_term}</span>"
         for search_term in item.get("search_terms", []):
-            search_terms_html += search_term_template.format(
-                **{
-                    "class": f"search_terms{' search_only' if search_only else ''}",
-                    "search_term": search_term,
-                }
-            )
+            search_terms_html += f"<div class='hidden search_terms{' search_only' if search_only else ''}'>{search_term}</div>"
 
         description = (item.get("description", "") or "" if shared.opts.extra_networks_card_show_desc else "")
         if not shared.opts.extra_networks_card_description_is_html:
@@ -250,7 +242,7 @@ class ExtraNetworksPage:
             "metadata_button": btn_metadata,
             "name": html.escape(item["name"]),
             "filename": filename,
-            "size": sysinfo.hr_size(filename),
+            "size": self.lister.mctime(filename)[2],
             "prompt": item.get("prompt", None),
             "save_card_preview": html.escape(f"return saveCardPreview(event, '{tabname}', '{item['local_preview']}');"),
             "search_only": " search_only" if search_only else "",
@@ -382,14 +374,14 @@ class ExtraNetworksPage:
         List of default keys used for sorting in the UI.
         """
         pth = Path(path)
-        stat = pth.stat()
-        mtime, ctime = self.lister.mctime(path)
+        # stat = pth.stat()
+        mtime, ctime, size = self.lister.mctime(path)
         return {
             "created": int(ctime),
             "modified": int(mtime),
             "name": pth.name.lower(),
             "path": str(pth).lower(),
-            "size": stat.st_size
+            "size": size
         }
 
     def find_preview(self, path):
@@ -513,7 +505,7 @@ def create_ui(interface: gr.Blocks, unrelated_tabs, tabname):
             create_html()
             return ui.pages_contents
 
-        button_refresh = gr.Button("Refresh", elem_id=f"{tabname}_{page.extra_networks_tabname}_extra_refresh_internal", visible=False)
+        button_refresh = gr.Button("Refresh", elem_id=f"{tabname}_{page.extra_networks_tabname}_refresh_internal", visible=False)
         button_refresh.click(fn=refresh, inputs=[], outputs=ui.pages).then(fn=lambda: None, _js=f"() => applyExtraNetworkFilter('{tabname}_{page.extra_networks_tabname}')")
 
     def create_html():

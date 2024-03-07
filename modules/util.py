@@ -1,7 +1,7 @@
 import os
 import re
 
-from modules import shared
+from modules import shared, sysinfo
 from modules.paths_internal import script_path, cwd
 
 
@@ -77,7 +77,7 @@ class MassFileListerCachedDir:
         self.dirname = dirname
 
         stats = ((x.name, x.stat(follow_symlinks=False)) for x in os.scandir(self.dirname))
-        files = [(n, s.st_mtime, s.st_ctime) for n, s in stats]
+        files = [(n, s.st_mtime, s.st_ctime, sysinfo.pretty_bytes(s.st_size)) for n, s in stats]
         self.files = {x[0].lower(): x for x in files}
         self.files_cased = {x[0]: x for x in files}
 
@@ -113,7 +113,7 @@ class MassFileLister:
 
         try:
             os_stats = os.stat(path, follow_symlinks=False)
-            return filename, os_stats.st_mtime, os_stats.st_ctime
+            return filename, os_stats.st_mtime, os_stats.st_ctime, sysinfo.pretty_bytes(os_stats.st_size)
         except Exception:
             return None
 
@@ -131,7 +131,7 @@ class MassFileLister:
         """
 
         stats = self.find(path)
-        return (0, 0) if stats is None else stats[1:3]
+        return (0, 0, 0) if stats is None else stats[1:4]
 
     def reset(self):
         """Clear the cache of all directories."""

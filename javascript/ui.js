@@ -278,12 +278,7 @@ function ask_for_style_name(_, prompt_text, negative_prompt_text) {
 }
 
 function confirm_clear_prompt(prompt, negative_prompt) {
-    if (confirm("Delete prompt?")) {
-        prompt = "";
-        negative_prompt = "";
-    }
-
-    return [prompt, negative_prompt];
+    return ["", ""]
 }
 
 
@@ -336,14 +331,10 @@ onOptionsChanged(function() {
 let txt2img_textarea, img2img_textarea = undefined;
 
 function restart_reload() {
-    document.body.innerHTML = '<h1 style="font-family:monospace;margin-top:20%;color:lightgray;text-align:center;">Reloading...</h1>';
+    document.body.innerHTML = '<div style="padding-top:25%;color:#ccc;background:#222;text-align:center;flex:1"><h1>Reloading...</h1></div>'
 
     var requestPing = function() {
-        requestGet("./internal/ping", {}, function(data) {
-            location.reload();
-        }, function() {
-            setTimeout(requestPing, 500);
-        });
+        requestGet("./internal/ping", {}, () => location.reload(), () => setTimeout(requestPing, 500));
     };
 
     setTimeout(requestPing, 2000);
