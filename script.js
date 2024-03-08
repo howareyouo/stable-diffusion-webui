@@ -157,9 +157,13 @@ function createEl(tag, clazz, attrs, parent) {
             if (!parent) parent = attrs
         } else {
             for (let k in attrs) {
-                if (k.startsWith('on'))
-                    el.setAttribute(k, attrs[k])
-                else
+                if (k.startsWith('on')) {
+                    let handler = attrs[k]
+                    if (typeof handler == 'string')
+                        el.setAttribute(k, handler)
+                    else
+                        el[k] = handler
+                } else
                     el[k] = attrs[k]
             }
         }

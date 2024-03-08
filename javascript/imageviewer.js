@@ -1,10 +1,10 @@
 // A full size 'lightbox' preview modal shown when left clicking on gallery previews
 function closeModal() {
-    _("lightbox").style.display = "none";
+    _("lightbox").hidden = 1
 }
 
 function toggleModal() {
-    if (_("lightbox").style.display == "none")
+    if (_("lightbox").hidden)
         showModal(0, $('.gradio-gallery img')?.src)
     else
         closeModal()
@@ -17,22 +17,18 @@ function showModal(evt, src) {
     }
     const modalImage = _("modalImage");
     const lb = _("lightbox");
-    modalImage.src = src;
+    modalImage.src = src || './file=html/card-no-preview.png'
     modalZoomSet(modalImage, opts.js_modal_lightbox_initially_zoomed);
-    if (modalImage.style.display === 'none') {
+    if (modalImage.hidden) {
         lb.style.setProperty('background-image', 'url(' + source.src + ')');
     }
-    lb.style.display = "flex";
+    lb.hidden = 0
     lb.focus();
 
     /* show the save button in modal only on txt2img or img2img tabs
     const tabTxt2Img = _("tab_txt2img");
     const tabImg2Img = _("tab_img2img");
-    if (tabTxt2Img.style.display != "none" || tabImg2Img.style.display != "none") {
-        _("modal_save").style.display = "inline";
-    } else {
-        _("modal_save").style.display = "none";
-    }
+    _("modal_save").style.display = (tabTxt2Img.style.display != "none" || tabImg2Img.style.display != "none") ? "inline" : "none"
     */
 }
 
@@ -50,7 +46,7 @@ function updateOnBackgroundChange() {
             modalImage.src = preview[preview.length - 1].src;
         } else if (currentButton?.children?.length > 0 && modalImage.src != currentButton.children[0].src) {
             modalImage.src = currentButton.children[0].src;
-            if (modalImage.style.display === 'none') {
+            if (modalImage.hidden) {
                 const modal = _("lightbox");
                 modal.style.setProperty('background-image', `url(${modalImage.src})`);
             }
@@ -77,7 +73,7 @@ function modalImageSwitch(offset) {
             const modalImage = _("modalImage");
             const modal = _("lightbox");
             modalImage.src = nextButton.children[0].src;
-            if (modalImage.style.display === 'none') {
+            if (modalImage.hidden) {
                 modal.style.setProperty('background-image', `url(${modalImage.src})`);
             }
             setTimeout(function() {
@@ -175,20 +171,14 @@ function modalZoomToggle(event) {
 function modalTileImageToggle(event) {
     const modalImage = _("modalImage");
     const modal = _("lightbox");
-    const isTiling = modalImage.style.display === 'none';
-    if (isTiling) {
-        modalImage.style.display = 'block';
-        modal.style.setProperty('background-image', 'none');
-    } else {
-        modalImage.style.display = 'none';
-        modal.style.setProperty('background-image', `url(${modalImage.src})`);
-    }
-
-    event.stopPropagation();
+    modalImage.hidden = !modalImage.hidden
+    // hidden means tiling
+    modal.style.setProperty('background-image', modalImage.hidden ? 'none' : `url(${modalImage.src})`)
+    event.stopPropagation()
 }
 
 function onProgress(percent, progressText, previewImg) {
-    modalProgress.style.display = 'flex'
+    modalProgress.hidden = 0
     modalProgressBar.style.width = percent + '%'
     modalProgressBar.innerText = progressText
     if (percent == 100 && progressText == doneText) {
@@ -199,7 +189,7 @@ function onProgress(percent, progressText, previewImg) {
             // updateOnBackgroundChange()
         }
         setTimeout(() => {
-            modalProgress.style.display = 'none'
+            modalProgress.hidden = 1
         }, 777)
     } else if (previewImg) {
         modalImage.src = previewImg
@@ -208,7 +198,7 @@ function onProgress(percent, progressText, previewImg) {
 
 let modalProgress, modalProgressBar
 document.addEventListener("DOMContentLoaded", function() {
-    let modal = createEl('div', 'lightbox', {id: 'lightbox', tabIndex: 0, onclick: closeModal}, document.body)
+    let modal = createEl('div', 'lightbox', {id: 'lightbox', tabIndex: 0, onclick: closeModal, hidden: 1}, document.body)
     modal.on('keydown', modalKeyHandler, true)
     /*
     let modalControls = createEl('div', 'modalControls gradio-container', 0, modal)

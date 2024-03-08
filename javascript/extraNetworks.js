@@ -87,7 +87,7 @@ function setupExtraNetworksForTab(tabname) {
         extraNetworksApplyFilter[page.id] = applyFilter
         extraNetworksApplySort[page.id] = applySort
 
-        tabnav.append($('.extra-network-control', page))
+        tabnav.insertBefore($('.extra-network-control', page), tabnav.lastElementChild)
 
         if (page.style.display != "none") {
             extraNetworksShowControlsForPage(tabname, page.id)
@@ -207,7 +207,6 @@ function updatePromptArea(text, textarea, isNeg) {
         let add = trim(opts.extra_networks_add_text_separator)
         textarea.value += (textarea.value.endsWith(add) ? '' : add) + ' ' + text
     }
-
     updateInput(textarea)
 }
 
@@ -228,8 +227,7 @@ function saveCardPreview(event, tabname, filename) {
     let textarea = $('#' + tabname + '_preview_filename  > label > textarea')
     let button = _(tabname + '_save_preview')
 
-    textarea.value = filename;
-    updateInput(textarea);
+    updateInput(textarea, filename)
 
     button.click();
 
@@ -311,7 +309,6 @@ function extraNetworksRequestMetadata(event, extraPage, cardName) {
     let showError = function () {
         extraNetworksShowMetadata('there was an error getting metadata')
     }
-
     requestGet("./sd_extra_networks/metadata", {page: extraPage, item: cardName}, function(data) {
         if (data && data.metadata) {
             extraNetworksShowMetadata(data.metadata);
@@ -336,14 +333,10 @@ function extraNetworksEditUserMetadata(event, tabname, extraPage, cardName) {
         editor.button = $("#" + id + "_button");
         extraPageUserMetadataEditors[id] = editor;
     }
-
-    editor.nameTextarea.value = cardName;
-    updateInput(editor.nameTextarea);
-
+    updateInput(editor.nameTextarea, cardName)
     editor.button.click();
 
     popup(editor.page);
-
     event.stopPropagation();
 }
 
