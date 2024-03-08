@@ -38,11 +38,7 @@ environment_whitelist = {
 
 # get relative path
 def shorten(filepath:str) -> str:
-    mi = filepath.find("models" + os.sep)
-    if mi >= 0:
-        return filepath[mi + 7:]
-    return filepath
-
+    return os.path.relpath(filepath, "models")
 
 def hr_size(filepath:str) -> str:
     stat = os.stat(filepath)

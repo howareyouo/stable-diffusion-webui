@@ -208,7 +208,7 @@ function onProgress(percent, progressText, previewImg) {
 
 let modalProgress, modalProgressBar
 document.addEventListener("DOMContentLoaded", function() {
-    let modal = createEl('div', '', {id: 'lightbox', tabIndex: 0, onclick: closeModal}, document.body)
+    let modal = createEl('div', 'lightbox', {id: 'lightbox', tabIndex: 0, onclick: closeModal}, document.body)
     modal.on('keydown', modalKeyHandler, true)
     /*
     let modalControls = createEl('div', 'modalControls gradio-container', 0, modal)

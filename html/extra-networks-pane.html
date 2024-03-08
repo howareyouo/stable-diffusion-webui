@@ -1,4 +1,4 @@
-<div class="extra-network-control {tabname}_{extra_networks_tabname}" hidden>
+<div class="extra-network-control" role="{tabname}_{extra_networks_tabname}" hidden>
     <input 
         id="{tabname}_{extra_networks_tabname}_search"
         class="extra-network-control-search"
@@ -18,9 +18,8 @@
     <div
         id="{tabname}_{extra_networks_tabname}_sort_dir"
         class="extra-network-control-sort-dir"
-        data-sortdir="{data_sortdir}"
-        title="Sort ascending"
-        onclick="extraNetworksControlSortDirOnClick(event, '{tabname}', '{extra_networks_tabname}')">
+        title="Sort direction"
+        onclick="extraNetworksControlSortDirClick(event, '{tabname}', '{extra_networks_tabname}')">
         <i class="extra-network-control-sort-dir-icon"></i>
     </div>
     <label for="{tabname}_{extra_networks_tabname}_refresh_internal"

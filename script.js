@@ -101,19 +101,16 @@ function executeCallbacks(queue, arg) {
 function scheduleAfterUiUpdateCallbacks() {
     clearTimeout(uiAfterUpdateTimeout);
     uiAfterUpdateTimeout = setTimeout(function() {
-        executeCallbacks(uiAfterUpdateCallbacks);
+        executeCallbacks(uiAfterUpdateCallbacks)
     }, 200);
 }
 
-let executedOnLoaded = false
+function gradioAppLoaded() {
+    executeCallbacks(uiLoadedCallbacks)
+}
 
 document.on("DOMContentLoaded", function() {
     let mutationObserver = new MutationObserver(function (m) {
-        if (!executedOnLoaded && $('#txt2img_prompt')) {
-            executedOnLoaded = true
-            executeCallbacks(uiLoadedCallbacks)
-        }
-
         executeCallbacks(uiUpdateCallbacks, m)
         scheduleAfterUiUpdateCallbacks()
         let newTab = get_uiCurrentTab()?.innerText
@@ -155,66 +152,21 @@ function elementIndex(element) {
 function createEl(tag, clazz, attrs, parent) {
     let el = document.createElement(tag)
     clazz && (el.className = clazz)
-    attrs && Object.assign(el, attrs)
-    parent && parent.appendChild(el)
-    return el
-}
-
-/**
- * Add keyboard shortcuts:
- * Ctrl+Enter to start/restart a generation
- * Alt/Option+Enter to skip a generation
- * Esc to interrupt a generation
- 
-document.on('keydown', function(e) {
-    let isEnter = e.key === 'Enter' || e.keyCode === 13;
-    let isCtrlKey = e.metaKey || e.ctrlKey;
-    let isAltKey = e.altKey;
-    let isEsc = e.key === 'Escape';
-
-    let generateButton = get_uiCurrentTabContent().querySelector('button[id$=_generate]');
-    let interruptButton = get_uiCurrentTabContent().querySelector('button[id$=_interrupt]');
-    let skipButton = get_uiCurrentTabContent().querySelector('button[id$=_skip]');
-
-    if (isCtrlKey && isEnter) {
-        if (interruptButton.style.display === 'block') {
-            interruptButton.click();
-            let callback = (mutationList) => {
-                for (let mutation of mutationList) {
-                    if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
-                        if (interruptButton.style.display === 'none') {
-                            generateButton.click();
-                            observer.disconnect();
-                        }
-                    }
-                }
-            };
-            let observer = new MutationObserver(callback);
-            observer.observe(interruptButton, {attributes: true});
+    if (attrs) {
+        if (attrs instanceof Element) {
+            if (!parent) parent = attrs
         } else {
-            generateButton.click();
-        }
-        e.preventDefault();
-    }
-
-    if (isAltKey && isEnter) {
-        skipButton.click();
-        e.preventDefault();
-    }
-
-    if (isEsc) {
-        let globalPopup = document.querySelector('.global-popup');
-        let lightbox = document.querySelector('#lightbox');
-        if (!globalPopup || globalPopup.style.display === 'none') {
-            if (document.activeElement === lightbox) return;
-            if (interruptButton.style.display === 'block') {
-                interruptButton.click();
-                e.preventDefault();
+            for (let k in attrs) {
+                if (k.startsWith('on'))
+                    el.setAttribute(k, attrs[k])
+                else
+                    el[k] = attrs[k]
             }
         }
     }
-});
-*/
+    parent && parent.appendChild(el)
+    return el
+}
 
 function doGenerate(e) {
     get_uiCurrentTabContent().querySelector('button[id$=_generate]')?.click()

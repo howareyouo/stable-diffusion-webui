@@ -98,7 +98,7 @@ def add_pages_to_demo(app):
 def quote_js(s):
     s = s.replace('\\', '\\\\')
     s = s.replace('"', '\\"')
-    return f'"{s}"'
+    return f"'{s}'"
 
 class ExtraNetworksPage:
     def __init__(self, title):
@@ -302,10 +302,6 @@ class ExtraNetworksPage:
             if "user_metadata" not in item:
                 self.read_user_metadata(item)
 
-        data_sortdir = shared.opts.extra_networks_card_order
-        data_sortmode = shared.opts.extra_networks_card_order_field.lower().replace("sort", "").replace(" ", "_").rstrip("_").strip()
-        data_sortkey = f"{data_sortmode}-{data_sortdir}-{len(self.items)}"
-
         subdirs = {}
         for parentdir in [os.path.abspath(x) for x in self.allowed_directories_for_previews()]:
             for root, dirs, _ in sorted(os.walk(parentdir, followlinks=True), key=lambda x: shared.natural_sort_key(x[0])):
@@ -337,7 +333,7 @@ class ExtraNetworksPage:
             subdirs = {"": 1, **subdirs}
 
         subdirs_html = "".join([f"""
-            <button class='lg secondary gradio-button custom-button' onclick='applyExtraNetworkFilter("{tabname}_{self.extra_networks_tabname}", "{subdir}")'>
+            <button class='lg secondary gradio-button custom-button' onclick='applyExtraNetworkFilter("{tabname}_{self.extra_networks_tabname}", 0, "{subdir}")'>
             {html.escape(subdir if subdir!="" else "all")}
             </button>
             """ for subdir in subdirs])
@@ -346,9 +342,6 @@ class ExtraNetworksPage:
             **{
                 "tabname": tabname,
                 "extra_networks_tabname": self.extra_networks_tabname,
-                "data_sortmode": data_sortmode,
-                "data_sortkey": data_sortkey,
-                "data_sortdir": data_sortdir,
                 "subdirs_html": subdirs_html,
                 "items_html": self.create_card_view_html(tabname, none_message="Loading..." if empty else None),
             }
@@ -497,7 +490,7 @@ def create_ui(interface: gr.Blocks, unrelated_tabs, tabname):
             return ui.pages_contents
 
         button_refresh = gr.Button("Refresh", elem_id=f"{tabname_full}_refresh_internal", visible=False)
-        button_refresh.click(fn=refresh, outputs=ui.pages).then(fn=lambda: None, _js=f"() => applyExtraNetworkFilter('{tabname_full}')")
+        button_refresh.click(fn=refresh, outputs=ui.pages).then(fn=lambda: None, _js=f"() => applyExtraNetworkFilter('{tabname_full}', 1)")
 
     def create_html():
         ui.pages_contents = [pg.create_html(ui.tabname) for pg in ui.stored_extra_pages]
@@ -507,7 +500,7 @@ def create_ui(interface: gr.Blocks, unrelated_tabs, tabname):
             create_html()
         return ui.pages_contents
 
-    interface.load(fn=pages_html, outputs=ui.pages)
+    interface.load(fn=pages_html, outputs=ui.pages).then(fn=lambda: None, _js=f"{tabname}Loaded")
 
     return ui
 

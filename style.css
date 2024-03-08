@@ -1305,3 +1305,11 @@ option {
 .extra-network-control div:active {
     filter: brightness(1.1) sepia(1)
 }
+
+.options .item:hover {
+    background-color: var(--primary-700)
+}
+
+.options .selected {
+    background-color: var(--primary-800) !important
+}

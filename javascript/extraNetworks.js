@@ -58,7 +58,7 @@ function setupExtraNetworksForTab(tabname) {
                 card.hidden = visible ? '' : 1
             }
             localSet(search.id, search.value)
-            sort && applySort()
+            sort == 1 && applySort()
         }
 
         let applySort = function() {
@@ -83,13 +83,11 @@ function setupExtraNetworksForTab(tabname) {
         sort_mod.value = localGet(sort_mod.id)
         sort_dir.dataset.sortdir = localGet(sort_dir.id)
 
-        search.on("input", applyFilter);
-        extraNetworksApplyFilter[page.id] = applyFilter;
-        extraNetworksApplySort[page.id] = applySort;
+        search.on("input", debounce(applyFilter, 500))
+        extraNetworksApplyFilter[page.id] = applyFilter
+        extraNetworksApplySort[page.id] = applySort
 
-        let controls = $('.extra-network-control', page)
-        tabnav.append(controls)
-        // controls.remove()
+        tabnav.append($('.extra-network-control', page))
 
         if (page.style.display != "none") {
             extraNetworksShowControlsForPage(tabname, page.id)
@@ -127,8 +125,8 @@ function extraNetworksMovePromptToTab(tabname, id, showPrompt, showNegativePromp
 
 
 function extraNetworksShowControlsForPage(tabname, tabname_full) {
-    $$(`#${tabname}_extra_tabs > .tab-nav > .extra-network-control`).forEach(function(el) {
-        el.hidden = el.classList.contains(tabname_full) ? '' : '1'
+    $$(`#${tabname}_extra_tabs > .tab-nav .extra-network-control`).forEach(function(el) {
+        el.hidden = el.role != tabname_full
     })
 }
 
@@ -141,14 +139,14 @@ function extraNetworksUnrelatedTabSelected(tabname) { // called from python when
 function extraNetworksTabSelected(tabname, id, showPrompt, showNegativePrompt, tabname_full) { // called from python when user selects an extra networks tab
     extraNetworksMovePromptToTab(tabname, id, showPrompt, showNegativePrompt);
     extraNetworksShowControlsForPage(tabname, tabname_full);
-    applyExtraNetworkFilter(tabname_full, undefined, 1)
+    applyExtraNetworkFilter(tabname_full, 1)
 }
 
-function applyExtraNetworkFilter(tabname_full, subdir, sort) {
+function applyExtraNetworkFilter(tabname_full, sort, subdir) {
     if (subdir != undefined) {
         $(`#${tabname_full}_search`).value = subdir
     }
-    setTimeout(() => extraNetworksApplyFilter[tabname_full](sort), 1)
+    setTimeout(extraNetworksApplyFilter[tabname_full], 1, sort)
 }
 
 function applyExtraNetworkSort(tabname_full) {
@@ -239,15 +237,9 @@ function saveCardPreview(event, tabname, filename) {
     event.preventDefault();
 }
 
-function extraNetworksControlSortDirOnClick(event, tabname, extra_networks_tabname) {
+function extraNetworksControlSortDirClick(event, tabname, extra_networks_tabname) {
     let el = event.currentTarget
-    if (el.dataset.sortdir == "Ascending") {
-        el.dataset.sortdir = "Descending";
-        el.setAttribute("title", "Sort descending");
-    } else {
-        el.dataset.sortdir = "Ascending";
-        el.setAttribute("title", "Sort ascending");
-    }
+    el.dataset.sortdir = el.dataset.sortdir == "Ascending" ? "Descending" : "Ascending"
     applyExtraNetworkSort(tabname + "_" + extra_networks_tabname);
 }
 
@@ -371,7 +363,10 @@ function extraNetworksRefreshSingleCard(page, tabname, name) {
     })
 }
 
-onUiLoaded(function() {
+function txt2imgLoaded() {
     setupExtraNetworksForTab('txt2img')
+}
+
+function img2imgLoaded() {
     setupExtraNetworksForTab('img2img')
-})
+}
