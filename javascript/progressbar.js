@@ -66,7 +66,8 @@ function setTitle(progress) {
 
 
 function randomId() {
-    return "task(" + Math.random().toString(36).slice(2, 7) + Math.random().toString(36).slice(2, 7) + Math.random().toString(36).slice(2, 7) + ")";
+    let r = () => Math.random().toString(36).slice(2, 7)
+    return "task(" + r() + r() + r() + ")";
 }
 
 const progressListeners = []

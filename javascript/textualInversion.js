@@ -1,6 +1,4 @@
 
-
-
 function start_training_textual_inversion() {
     $('#ti_error').innerHTML = '';
 

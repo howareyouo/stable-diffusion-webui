@@ -2,6 +2,8 @@ let gradioApp = () => document
 let _ = id => document.getElementById(id)
 let $ = (selector, node = document) => node.querySelector(':scope ' + selector)
 let $$ = (selector, node = document) => [...node.querySelectorAll(':scope ' + selector)]
+HTMLElement.prototype.all = HTMLElement.prototype.querySelectorAll
+HTMLElement.prototype.one = HTMLElement.prototype.querySelector
 EventTarget.prototype.on = EventTarget.prototype.addEventListener
 String.prototype.splice = function (start, rem, add) {
     return this.slice(0, start) + add + this.slice(start + Math.abs(rem))
@@ -173,7 +175,7 @@ function createEl(tag, clazz, attrs, parent) {
 }
 
 function doGenerate(e) {
-    get_uiCurrentTabContent().querySelector('button[id$=_generate]')?.click()
+    get_uiCurrentTabContent().one('button[id$=_generate]')?.click()
     if (e) {
         e.stopPropagation()
         e.preventDefault()

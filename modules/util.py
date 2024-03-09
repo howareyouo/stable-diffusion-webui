@@ -15,24 +15,38 @@ def listfiles(dirname):
     filenames = [os.path.join(dirname, x) for x in sorted(os.listdir(dirname), key=natural_sort_key) if not x.startswith(".")]
     return [file for file in filenames if os.path.isfile(file)]
 
+def r(text):
+    return Style.DIM + Fore.RED + text + + Fore.RESET
+
+def rr(text):
+    return Fore.RED + text + + Fore.RESET
+
+def rrr(text):
+    return Fore.LIGHTRED_EX + text + + Fore.RESET
 
 def g(text):
-    return Fore.GREEN + text + Style.RESET
+    return Style.DIM + Fore.GREEN + text + + Fore.RESET
 
 def gg(text):
-    return Style.DIM + Fore.LIGHTGREEN_EX + text + Style.RESET_ALL
+    return Fore.GREEN + text + Fore.RESET
+
+def ggg(text):
+    return Fore.LIGHTGREEN_EX + text + Fore.RESET
 
 def y(text):
-    return Fore.YELLOW + text + Fore.RESET
+    return Style.DIM + Fore.YELLOW + text + Fore.RESET + Style.RESET_ALL
 
 def yy(text):
-    return Style.DIM + Fore.LIGHTYELLOW_EX + text + Style.RESET_ALL
+    return Fore.YELLOW + text + Fore.RESET
+
+def yyy(text):
+    return Fore.LIGHTYELLOW_EX + text + Fore.RESET
 
 def html_path(filename):
     return os.path.join(script_path, "html", filename)
 
 def shortern(filename):
-    return y(os.path.relpath(filename, "models"))
+    return yy(os.path.relpath(filename, "models"))
 
 
 def html(filename):

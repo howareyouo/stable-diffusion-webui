@@ -226,7 +226,7 @@ def select_checkpoint():
 
     checkpoint_info = next(iter(checkpoints_list.values()))
     if model_checkpoint is not None:
-        print(f"Checkpoint {model_checkpoint} not found; loading fallback {checkpoint_info.title}", file=sys.stderr)
+        print(f"Checkpoint {model_checkpoint} not found; loading fallback {checkpoint_info.name}", file=sys.stderr)
 
     return checkpoint_info
 
@@ -751,7 +751,7 @@ def load_model(checkpoint_info=None, already_loaded_state_dict=None):
     timer.record("load weights from state dict")
 
     send_model_to_device(sd_model)
-    timer.record("move model to device")
+    timer.record("move to device")
 
     sd_hijack.model_hijack.hijack(sd_model)
 
@@ -815,11 +815,11 @@ def reuse_model_from_already_loaded(sd_model, checkpoint_info, timer):
             shared.opts.data["sd_model_checkpoint"] = already_loaded.sd_checkpoint_info.title
             shared.opts.data["sd_checkpoint_hash"] = already_loaded.sd_checkpoint_info.sha256
 
-        print(f"Using loaded model {util.y(already_loaded.sd_checkpoint_info.title)}: done in {timer.summary()}")
+        print(f"Using loaded model {util.yy(already_loaded.sd_checkpoint_info.name)}: done in {timer.summary()}")
         sd_vae.reload_vae_weights(already_loaded)
         return model_data.sd_model
     elif shared.opts.sd_checkpoints_limit > 1 and len(model_data.loaded_sd_models) < shared.opts.sd_checkpoints_limit:
-        print(f"Loading model {util.y(checkpoint_info.title)} ({len(model_data.loaded_sd_models) + 1} out of {shared.opts.sd_checkpoints_limit})")
+        print(f"Loading model {util.y(checkpoint_info.name)} ({len(model_data.loaded_sd_models) + 1} out of {shared.opts.sd_checkpoints_limit})")
 
         model_data.sd_model = None
         load_model(checkpoint_info)
@@ -832,7 +832,7 @@ def reuse_model_from_already_loaded(sd_model, checkpoint_info, timer):
         sd_vae.loaded_vae_file = getattr(sd_model, "loaded_vae_file", None)
         sd_vae.checkpoint_info = sd_model.sd_checkpoint_info
 
-        print(f"Reusing loaded model {util.y(sd_model.sd_checkpoint_info.title)} to load {util.yy(checkpoint_info.title)}")
+        print(f"Reusing loaded model {util.yy(sd_model.sd_checkpoint_info.name)} to load {util.y(checkpoint_info.name)}")
         return sd_model
     else:
         return None
@@ -890,7 +890,7 @@ def reload_model_weights(sd_model=None, info=None, forced_reload=False):
 
         if not sd_model.lowvram:
             sd_model.to(devices.device)
-            timer.record("move model to device")
+            timer.record("move to device")
 
         script_callbacks.model_loaded_callback(sd_model)
         timer.record("script callbacks")

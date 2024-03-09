@@ -17,8 +17,8 @@ function showModal(evt, src) {
     }
     const modalImage = _("modalImage");
     const lb = _("lightbox");
-    modalImage.src = src || './file=html/card-no-preview.png'
-    modalZoomSet(modalImage, opts.js_modal_lightbox_initially_zoomed);
+    modalImage.src = src
+    modalZoomSet(modalImage, opts.js_modal_lightbox_initially_zoomed)
     if (modalImage.hidden) {
         lb.style.setProperty('background-image', 'url(' + source.src + ')');
     }
@@ -151,15 +151,14 @@ function setupImageForLightbox(e) {
         }
         if (!opts.js_modal_lightbox || evt.button != 0) return;
 
-        modalZoomSet(_('modalImage'), opts.js_modal_lightbox_initially_zoomed);
-        evt.preventDefault();
-        showModal(evt);
-    }, true);
-
+        modalZoomSet(_('modalImage'), opts.js_modal_lightbox_initially_zoomed)
+        evt.preventDefault()
+        showModal(evt)
+    }, true)
 }
 
 function modalZoomSet(modalImage, enable) {
-    if (modalImage) modalImage.classList.toggle('modalImageFullscreen', !!enable);
+    modalImage.classList.toggle('modalImageFullscreen', !!enable);
 }
 
 function modalZoomToggle(event) {

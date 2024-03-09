@@ -195,11 +195,11 @@ function tryToRemoveExtraNetworkFromPrompt(textarea, text, isNeg) {
     }
 
     if (replaced) {
-        textarea.value = newValue;
-        return true;
+        textarea.value = newValue
+        return true
     }
 
-    return false;
+    return false
 }
 
 function updatePromptArea(text, textarea, isNeg) {
@@ -214,6 +214,7 @@ function cardClicked(tabname, textToAdd, textToAddNegative, allowNegativePrompt)
     let textarea = allowNegativePrompt ? activePromptTextarea[tabname] : $(`#${tabname}_prompt textarea`)
     if (textarea.start != textarea.end) {
         textarea.setRangeText(textToAdd, textarea.start, textarea.end, 'select')
+        updateInput(textarea)
         textarea.focus()
     } else if (textToAddNegative) {
         updatePromptArea(textToAdd, textarea);
@@ -223,16 +224,14 @@ function cardClicked(tabname, textToAdd, textToAddNegative, allowNegativePrompt)
     }
 }
 
-function saveCardPreview(event, tabname, filename) {
+function saveCardPreview(evt, tabname, filename) {
     let textarea = $('#' + tabname + '_preview_filename  > label > textarea')
     let button = _(tabname + '_save_preview')
 
     updateInput(textarea, filename)
 
     button.click();
-
-    event.stopPropagation();
-    event.preventDefault();
+    evt.stopPropagation();
 }
 
 function extraNetworksControlSortDirClick(event, tabname, extra_networks_tabname) {

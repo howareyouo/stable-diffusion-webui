@@ -73,7 +73,7 @@ class Timer:
         res += ", ".join([f"{category}: {Fore.LIGHTWHITE_EX}{time_taken:.1f}s{Fore.RESET}" for category, time_taken in additions])
         res += ")"
 
-        return res
+        return res.replace('0.', '.').replace('.0', '')
 
     def dump(self):
         return {'total': self.total, 'records': self.records}

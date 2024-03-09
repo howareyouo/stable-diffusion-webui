@@ -100,6 +100,9 @@ class UpscalerData:
 
     def __repr__(self):
         return f"<UpscalerData name={self.name} path={self.data_path} scale={self.scale}>"
+    
+    def __eq__(self, other):
+        return self.name == other.name
 
 
 class UpscalerNone(Upscaler):

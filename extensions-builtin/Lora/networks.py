@@ -17,7 +17,7 @@ import network_oft
 import torch
 from typing import Union
 
-from modules import shared, devices, sd_models, errors, scripts, sd_hijack
+from modules import shared, devices, sd_models, errors, scripts, sd_hijack, util
 import modules.textual_inversion.textual_inversion as textual_inversion
 
 from lora_logger import logger
@@ -318,7 +318,7 @@ def load_networks(names, te_multipliers=None, unet_multipliers=None, dyn_dims=No
         lora_not_found_message = f'Lora not found: {", ".join(failed_to_load_networks)}'
         sd_hijack.model_hijack.comments.append(lora_not_found_message)
         if shared.opts.lora_not_found_warning_console:
-            print(f'\n{lora_not_found_message}\n')
+            print(f'{util.r(lora_not_found_message)}')
         if shared.opts.lora_not_found_gradio_warning:
             gr.Warning(lora_not_found_message)
 

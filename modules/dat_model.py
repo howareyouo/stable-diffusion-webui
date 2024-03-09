@@ -19,7 +19,7 @@ class UpscalerDAT(Upscaler):
             self.scalers.append(scaler_data)
 
         for model in get_dat_models(self):
-            if model.name in opts.dat_enabled_models:
+            if model.name in opts.dat_enabled_models and model not in self.scalers:
                 self.scalers.append(model)
 
     def do_upscale(self, img, path):

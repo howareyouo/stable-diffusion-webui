@@ -107,7 +107,7 @@ onAfterUiUpdate(function() {
                 if (is_height) {
                     currentHeight = e.value * 1.0;
                 }
-            });
+            })
         }
     }
-});
+})
