@@ -200,7 +200,7 @@ document.addEventListener("DOMContentLoaded", function() {
     let modal = createElement('div', 'lightbox', {id: 'lightbox', tabIndex: 0, onclick: closeModal, hidden: 1}, document.body)
     modal.on('keydown', modalKeyHandler, true)
     /*
-    let modalControls = createElement('div', 'modalControls gradio-container', 0, modal)
+    let modalControls = createElement('div', 'modalControls gradio-container', modal)
     createElement('span', 'modalZoom', {innerHTML: '🔍', title: "Toggle zoomed view"}, modalControls)
         .on('click', modalZoomToggle, true)
     createElement('span', 'modalTileImage', {innerHTML: '🏁', title: "Preview tiling"}, modalControls)
@@ -215,13 +215,9 @@ document.addEventListener("DOMContentLoaded", function() {
     */
     createElement('img', '', {id: 'modalImage'}, modal)
 
-    modalProgress = createElement('div', 'modal-progress', 0, modal)
-    modalProgressBar = createElement('div', 'progress-bar', 0, modalProgress)
-
-    document.body.appendChild(modal)
-
-
-});
+    modalProgress = createElement('div', 'modal-progress', modal)
+    modalProgressBar = createElement('div', 'progress-bar', modalProgress)
+})
 
 onUiLoaded(function() {
     registerProgressLiseners(onProgress)

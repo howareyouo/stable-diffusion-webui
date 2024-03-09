@@ -7,14 +7,13 @@ let settingsExcludeTabsFromShowAll = {
 
 function settingsShowAllTabs() {
     $$('#settings > div').forEach(function(elem) {
-        if (settingsExcludeTabsFromShowAll[elem.id]) return;
-
-        elem.style.display = "block";
+        if (settingsExcludeTabsFromShowAll[elem.id]) return
+        elem.style.display = "block"
     });
 }
 
 function settingsShowOneTab() {
-    $('#settings_show_one_page').click();
+    $('#settings_show_one_page').click()
 }
 
 onUiLoaded(function() {
@@ -38,10 +37,8 @@ onUiLoaded(function() {
         }
     });
 
-    settings_tabs.insertBefore(edit, settings_tabs.firstChild);
-    settings_tabs.appendChild(buttonShowAllPages);
-
-
+    settings_tabs.prepend(edit)
+    settings_tabs.append(buttonShowAllPages)
     buttonShowAllPages.addEventListener("click", settingsShowAllTabs);
 });
 
@@ -58,14 +55,10 @@ onOptionsChanged(function() {
         var section = localization[x[0]] ?? x[0];
         var category = localization[x[1]] ?? x[1];
 
-        var span = document.createElement('SPAN');
-        span.textContent = category;
-        span.className = 'settings-category';
-
         var sectionElem = sectionMap[section];
         if (!sectionElem) return;
 
-        sectionElem.parentElement.insertBefore(span, sectionElem);
-    });
-});
-
+        var span = createElement('SPAN', 'settings-category', {textContent: category})
+        sectionElem.insertAdjacentElement('beforebegin', span)
+    })
+})

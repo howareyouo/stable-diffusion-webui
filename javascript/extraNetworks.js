@@ -173,14 +173,14 @@ function tryToRemoveExtraNetworkFromPrompt(textarea, text, isNeg) {
         let partToSearch = m[1]
         let foundPos = -1
         newValue = textarea.value.replaceAll(isNeg ? re_extranet_g_neg : re_extranet_g, function(found, net, pos) {
-            m = found.match(isNeg ? re_extranet_neg : re_extranet);
+            m = found.match(isNeg ? re_extranet_neg : re_extranet)
             if (m[1] == partToSearch) {
                 replaced = true
                 foundPos = pos
                 return ""
             }
             return found
-        });
+        })
         if (foundPos >= 0) {
             if (extraTextAfterNet && newValue.substr(foundPos, extraTextAfterNet.length) == extraTextAfterNet) {
                 newValue = newValue.substr(0, foundPos) + newValue.substr(foundPos + extraTextAfterNet.length);
@@ -197,11 +197,8 @@ function tryToRemoveExtraNetworkFromPrompt(textarea, text, isNeg) {
     if (replaced) {
         textarea.value = newValue
         return true
-        textarea.value = newValue
-        return true
     }
 
-    return false
     return false
 }
 
@@ -218,23 +215,21 @@ function cardClicked(tabname, textToAdd, textToAddNegative, allowNegativePrompt)
     if (textarea.start != textarea.end) {
         textarea.setRangeText(textToAdd, textarea.start, textarea.end, 'select')
         updateInput(textarea)
-        updateInput(textarea)
         textarea.focus()
     } else if (textToAddNegative) {
         updatePromptArea(textToAdd, textarea);
-        updatePromptArea(textToAddNegative, $(`#${tabname}_neg_prompt textarea`), true);
+        updatePromptArea(textToAddNegative, $(`#${tabname}_neg_prompt textarea`), true)
     } else {
-        updatePromptArea(textToAdd, textarea);
+        updatePromptArea(textToAdd, textarea)
     }
 }
 
 function saveCardPreview(evt, tabname, filename) {
-    let textarea = $('#' + tabname + '_preview_filename  > label > textarea')
-    let button = _(tabname + '_save_preview')
+    let textarea = $('#' + tabname + '_preview_filename textarea')
 
     updateInput(textarea, filename)
 
-    button.click()
+    _(tabname + '_save_preview').click()
     evt.stopPropagation()
 }
 

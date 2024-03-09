@@ -1,34 +1,25 @@
 // code related to showing and updating progressbar shown as the image is being made
 
-function rememberGallerySelection() {
-
-}
-
-function getGallerySelectedIndex() {
-
-}
-
 function request(url, data, handler, errorHandler) {
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", url, true);
-    xhr.setRequestHeader("Content-Type", "application/json");
+    var xhr = new XMLHttpRequest()
+    xhr.open("POST", url, true)
+    xhr.setRequestHeader("Content-Type", "application/json")
     xhr.onreadystatechange = function() {
         if (xhr.readyState === 4) {
             if (xhr.status === 200) {
                 try {
-                    var js = JSON.parse(xhr.responseText);
-                    handler(js);
+                    var js = JSON.parse(xhr.responseText)
+                    handler(js)
                 } catch (error) {
-                    console.error(error);
-                    errorHandler();
+                    console.error(error)
+                    errorHandler()
                 }
             } else {
-                errorHandler();
+                errorHandler()
             }
         }
-    };
-    var js = JSON.stringify(data);
-    xhr.send(js);
+    }
+    xhr.send(JSON.stringify(data))
 }
 
 function pad2(x) {
@@ -46,28 +37,28 @@ function formatTime(secs) {
 }
 
 
-var originalAppTitle = undefined;
+var originalAppTitle = undefined
 
 onUiLoaded(function() {
-    originalAppTitle = document.title;
-});
+    originalAppTitle = document.title
+})
 
 function setTitle(progress) {
-    var title = originalAppTitle;
+    var title = originalAppTitle
 
     if (opts.show_progress_in_title && progress) {
-        title = '[' + progress.trim() + '] ' + title;
+        title = '[' + progress.trim() + '] ' + title
     }
 
     if (document.title != title) {
-        document.title = title;
+        document.title = title
     }
 }
 
 
 function randomId() {
     let r = () => Math.random().toString(36).slice(2, 7)
-    return "task(" + r() + r() + r() + ")";
+    return "task(" + r() + r() + r() + ")"
 }
 
 const progressListeners = []

@@ -1,14 +1,14 @@
 // various functions for interaction with ui.py not large enough to warrant putting them in separate files
 
 function set_theme(theme) {
-    var gradioURL = window.location.href;
+    var gradioURL = location.href;
     if (!gradioURL.includes('?__theme=')) {
-        window.location.replace(gradioURL + '?__theme=' + theme);
+        location.replace(gradioURL + '?__theme=' + theme);
     }
 }
 
 function all_gallery_buttons() {
-    var allGalleryButtons = $$('#tabs .tabitem[style$="block;"] .gradio-gallery .thumbnails .thumbnail-item.thumbnail-small')
+    var allGalleryButtons = $$('#tabs .tabitem[style$="block;"] .gradio-gallery .thumbnails .thumbnail-small')
     var visibleGalleryButtons = [];
     allGalleryButtons.forEach(function(elem) {
         if (elem.parentElement.offsetParent) {
@@ -35,26 +35,24 @@ function extract_image_from_gallery(gallery) {
     }
 
     var index = selected_gallery_index();
-
     if (index < 0 || index >= gallery.length) {
         // Use the first image in the gallery as the default
         index = 0;
     }
-
     return [gallery[index]];
 }
 
 window.args_to_array = Array.from; // Compatibility with e.g. extensions that may expect this to be around
 
 function switch_to_txt2img() {
-    $('#tabs').querySelectorAll('button')[0].click();
+    $('#tabs').one('button').click();
 
     return Array.from(arguments);
 }
 
 function switch_to_img2img_tab(no) {
-    $('#tabs').querySelectorAll('button')[1].click();
-    _('mode_img2img').querySelectorAll('button')[no].click();
+    $('#tabs').all('button')[1].click();
+    _('mode_img2img').all('button')[no].click();
 }
 function switch_to_img2img() {
     switch_to_img2img_tab(0);
@@ -366,11 +364,10 @@ function updateImg2imgResizeToTextAfterChangingImage() {
     // There may be a better solution, but this is simple and straightforward so I'm going with it.
 
     setTimeout(function() {
-        _('img2img_update_resize_to').click();
-    }, 500);
+        _('img2img_update_resize_to').click()
+    }, 500)
 
-    return [];
-
+    return []
 }
 
 
