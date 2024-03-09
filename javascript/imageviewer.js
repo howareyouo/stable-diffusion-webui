@@ -197,26 +197,26 @@ function onProgress(percent, progressText, previewImg) {
 
 let modalProgress, modalProgressBar
 document.addEventListener("DOMContentLoaded", function() {
-    let modal = createEl('div', 'lightbox', {id: 'lightbox', tabIndex: 0, onclick: closeModal, hidden: 1}, document.body)
+    let modal = createElement('div', 'lightbox', {id: 'lightbox', tabIndex: 0, onclick: closeModal, hidden: 1}, document.body)
     modal.on('keydown', modalKeyHandler, true)
     /*
-    let modalControls = createEl('div', 'modalControls gradio-container', 0, modal)
-    createEl('span', 'modalZoom', {innerHTML: '🔍', title: "Toggle zoomed view"}, modalControls)
+    let modalControls = createElement('div', 'modalControls gradio-container', 0, modal)
+    createElement('span', 'modalZoom', {innerHTML: '🔍', title: "Toggle zoomed view"}, modalControls)
         .on('click', modalZoomToggle, true)
-    createEl('span', 'modalTileImage', {innerHTML: '🏁', title: "Preview tiling"}, modalControls)
+    createElement('span', 'modalTileImage', {innerHTML: '🏁', title: "Preview tiling"}, modalControls)
         .on('click', modalTileImageToggle, true);
-    createEl("span", "modalSave", {id: "modal_save", innerHTML: "💾", title: "Save Image(s)"}, modalControls)
+    createElement("span", "modalSave", {id: "modal_save", innerHTML: "💾", title: "Save Image(s)"}, modalControls)
         .on("click", modalSaveImage, true)
-    createEl('span', 'modalClose', {innerHTML: '✖', title: "Close Modal", onclick: closeModal}, modalControls)
-    createEl('a', 'modalPrev', {innerHTML: '◀', tabIndex: 0}, modal)
+    createElement('span', 'modalClose', {innerHTML: '✖', title: "Close Modal", onclick: closeModal}, modalControls)
+    createElement('a', 'modalPrev', {innerHTML: '◀', tabIndex: 0}, modal)
         .on('click', modalPrevImage, true)
-    createEl('a', 'modalNext', {innerHTML: '▶', tabIndex: 0}, modal)
+    createElement('a', 'modalNext', {innerHTML: '▶', tabIndex: 0}, modal)
         .on('click', modalNextImage, true);
     */
-    createEl('img', '', {id: 'modalImage'}, modal)
+    createElement('img', '', {id: 'modalImage'}, modal)
 
-    modalProgress = createEl('div', 'modal-progress', 0, modal)
-    modalProgressBar = createEl('div', 'progress-bar', 0, modalProgress)
+    modalProgress = createElement('div', 'modal-progress', 0, modal)
+    modalProgressBar = createElement('div', 'progress-bar', 0, modalProgress)
 
     document.body.appendChild(modal)
 

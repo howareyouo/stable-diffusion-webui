@@ -94,8 +94,8 @@ function setupExtraNetworksForTab(tabname) {
         }
     })
 
-    registerPrompt(tabname, tabname + "_prompt");
-    registerPrompt(tabname, tabname + "_neg_prompt");
+    registerPrompt(tabname, tabname + "_prompt")
+    registerPrompt(tabname, tabname + "_neg_prompt")
 }
 
 function extraNetworksMovePromptToTab(tabname, id, showPrompt, showNegativePrompt) {
@@ -175,11 +175,11 @@ function tryToRemoveExtraNetworkFromPrompt(textarea, text, isNeg) {
         newValue = textarea.value.replaceAll(isNeg ? re_extranet_g_neg : re_extranet_g, function(found, net, pos) {
             m = found.match(isNeg ? re_extranet_neg : re_extranet);
             if (m[1] == partToSearch) {
-                replaced = true;
-                foundPos = pos;
-                return "";
+                replaced = true
+                foundPos = pos
+                return ""
             }
-            return found;
+            return found
         });
         if (foundPos >= 0) {
             if (extraTextAfterNet && newValue.substr(foundPos, extraTextAfterNet.length) == extraTextAfterNet) {
@@ -197,8 +197,11 @@ function tryToRemoveExtraNetworkFromPrompt(textarea, text, isNeg) {
     if (replaced) {
         textarea.value = newValue
         return true
+        textarea.value = newValue
+        return true
     }
 
+    return false
     return false
 }
 
@@ -215,6 +218,7 @@ function cardClicked(tabname, textToAdd, textToAddNegative, allowNegativePrompt)
     if (textarea.start != textarea.end) {
         textarea.setRangeText(textToAdd, textarea.start, textarea.end, 'select')
         updateInput(textarea)
+        updateInput(textarea)
         textarea.focus()
     } else if (textToAddNegative) {
         updatePromptArea(textToAdd, textarea);
@@ -230,14 +234,14 @@ function saveCardPreview(evt, tabname, filename) {
 
     updateInput(textarea, filename)
 
-    button.click();
-    evt.stopPropagation();
+    button.click()
+    evt.stopPropagation()
 }
 
 function extraNetworksControlSortDirClick(event, tabname, extra_networks_tabname) {
     let el = event.currentTarget
     el.dataset.sortdir = el.dataset.sortdir == "Ascending" ? "Descending" : "Ascending"
-    applyExtraNetworkSort(tabname + "_" + extra_networks_tabname);
+    applyExtraNetworkSort(tabname + "_" + extra_networks_tabname)
 }
 
 let globalPopup, globalPopupBody
@@ -249,19 +253,16 @@ function closePopup () {
 
 function popup (elem) {
     if (!globalPopup) {
-        globalPopup = createEl('div', 'global-popup', {onclick: closePopup}, $('.main'))
+        globalPopup = createElement('div', 'global-popup', {onclick: closePopup}, $('.main'))
 
-        createEl('div', 'global-popup-close', {onclick: closePopup, title: 'Close'}, globalPopup)
+        createElement('div', 'global-popup-close', {onclick: closePopup, title: 'Close'}, globalPopup)
 
-        globalPopupBody = createEl('div', 'global-popup-inner', {
-            onclick: e => {
-                e.stopPropagation()
-                return false
-            }, title: 'Close'
+        globalPopupBody = createElement('div', 'global-popup-inner', {
+            onclick: e => e.stopPropagation(), 
+            title: 'Close'
         }, globalPopup)
     }
-    globalPopupBody.innerHTML = ''
-    globalPopupBody.appendChild(elem)
+    globalPopupBody.replaceChildren(elem)
     globalPopup.style.display = 'flex'
 }
 
@@ -269,13 +270,13 @@ let storedPopupIds = {}
 
 function popupId(id) {
     if (!storedPopupIds[id]) {
-        storedPopupIds[id] = _(id);
+        storedPopupIds[id] = _(id)
     }
-    popup(storedPopupIds[id]);
+    popup(storedPopupIds[id])
 }
 
 function extraNetworksShowMetadata (textContent) {
-    let elem = createEl('pre', 'popup-metadata', {textContent})
+    let elem = createElement('pre', 'popup-metadata', {textContent})
     popup(elem)
 }
 
@@ -299,24 +300,19 @@ function requestGet (url, data, handler, errorHandler) {
     xhr.send()
 }
 
-function extraNetworksCopyCardPath(event, path) {
-    navigator.clipboard.writeText(path);
-    event.stopPropagation();
-}
-
 function extraNetworksRequestMetadata(event, extraPage, cardName) {
     let showError = function () {
         extraNetworksShowMetadata('there was an error getting metadata')
     }
     requestGet("./sd_extra_networks/metadata", {page: extraPage, item: cardName}, function(data) {
         if (data && data.metadata) {
-            extraNetworksShowMetadata(data.metadata);
+            extraNetworksShowMetadata(data.metadata)
         } else {
-            showError();
+            showError()
         }
-    }, showError);
+    }, showError)
 
-    event.stopPropagation();
+    event.stopPropagation()
 }
 
 let extraPageUserMetadataEditors = {}
@@ -333,24 +329,17 @@ function extraNetworksEditUserMetadata(event, tabname, extraPage, cardName) {
         extraPageUserMetadataEditors[id] = editor;
     }
     updateInput(editor.nameTextarea, cardName)
-    editor.button.click();
+    editor.button.click()
 
-    popup(editor.page);
-    event.stopPropagation();
+    popup(editor.page)
+    event.stopPropagation()
 }
 
 function extraNetworksRefreshSingleCard(page, tabname, name) {
-    requestGet("./sd_extra_networks/get-single-card", {page: page, tabname: tabname, name: name}, function(data) {
-        if (data && data.html) {
-            let card = $(`#${tabname}_${page.replace(' ', '_')}_cards > .card[data-name="${name}"]`)
-
-            let newDiv = document.createElement('DIV')
-            newDiv.innerHTML = data.html;
-            let newCard = newDiv.firstElementChild
-
-            newCard.style.display = '';
-            card.parentElement.insertBefore(newCard, card);
-            card.parentElement.removeChild(card);
+    requestGet("./sd_extra_networks/get-single-card", {page, tabname, name}, function(data) {
+        if (data?.html) {
+            let card = $(`#${tabname}_${page.replace(' ', '_')}_html .card[data-name="${name}"]`)
+            card.replaceWith(createElementFromHtml(data.html))
         }
     })
 }

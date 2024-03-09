@@ -151,7 +151,7 @@ function elementIndex(element) {
     return [].indexOf.call(element.parentElement.children, element)
 }
 
-function createEl(tag, clazz, attrs, parent) {
+function createElement(tag, clazz, attrs, parent) {
     let el = document.createElement(tag)
     clazz && (el.className = clazz)
     if (attrs) {
@@ -170,9 +170,20 @@ function createEl(tag, clazz, attrs, parent) {
             }
         }
     }
-    parent && parent.appendChild(el)
+    parent && parent.append(el)
     return el
 }
+
+function createElementFromHtml(html) {
+    html = html.trim()
+    if (!html) return null
+  
+    let result = createElement('template', '', {innerHTML: html}).content.children
+  
+    // Then return either an HTMLElement or HTMLCollection,
+    // based on whether the input HTML had one or more roots.
+    return result.length === 1 ? result[0] : result
+  }
 
 function doGenerate(e) {
     get_uiCurrentTabContent().one('button[id$=_generate]')?.click()

@@ -92,11 +92,11 @@ function requestProgress(id_task, progressContainer, gallery, atEnd, onProgress,
     let timeStart = Date.now()
     let livePreview
 
-    let progress = createEl('div', 'progress', {style: {display: opts.show_progressbar ? 'flex' : 'none'}}, progressContainer)
-    let bar = createEl('div', 'progress-bar', 0, progress)
+    let progress = createElement('div', 'progress', {style: {display: opts.show_progressbar ? 'flex' : 'none'}}, progressContainer)
+    let bar = createElement('div', 'progress-bar', progress)
 
     if (gallery) {
-        livePreview = createEl('div', 'live-preview', '', gallery)
+        livePreview = createElement('div', 'live-preview', gallery)
     }
 
     function removeProgressBar(completed) {
@@ -144,7 +144,6 @@ function requestProgress(id_task, progressContainer, gallery, atEnd, onProgress,
                 return removeProgressBar()
             }
             if (res.live_preview && gallery) {
-                livePreview.style.height = gallery.getBoundingClientRect().height + 'px'
                 let img = new Image()
                 img.onload = () => livePreview.replaceChildren(img)
                 img.src = res.live_preview
