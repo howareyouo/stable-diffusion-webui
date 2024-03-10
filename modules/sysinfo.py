@@ -9,7 +9,7 @@ import psutil
 import re
 
 import launch
-from modules import paths_internal, timer, shared, extensions, errors
+from modules import paths_internal, timer, shared, extensions, errors, util
 
 checksum_token = "DontStealMyGamePlz__WINNERS_DONT_USE_DRUGS__DONT_COPY_THAT_FLOPPY"
 environment_whitelist = {
@@ -38,7 +38,7 @@ environment_whitelist = {
 
 # get relative path
 def shorten(filepath:str) -> str:
-    return os.path.relpath(filepath, "models")
+    return util.yy(os.path.relpath(filepath, "models"))
 
 def hr_size(filepath:str) -> str:
     stat = os.stat(filepath)

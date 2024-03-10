@@ -14,49 +14,37 @@ onOptionsChanged(function() {
         if (!commentBefore && !commentAfter) return;
 
         var span = null;
-        if (div.classList.contains('gradio-checkbox')) span = div.querySelector('label span');
-        else if (div.classList.contains('gradio-checkboxgroup')) span = div.querySelector('span').firstChild;
-        else if (div.classList.contains('gradio-radio')) span = div.querySelector('span').firstChild;
-        else span = div.querySelector('label span').firstChild;
+        if (div.classList.contains('gradio-checkbox')) span = div.one('label span');
+        else if (div.classList.contains('gradio-checkboxgroup')) span = div.one('span').firstChild;
+        else if (div.classList.contains('gradio-radio')) span = div.one('span').firstChild;
+        else span = div.one('label span').firstChild;
 
         if (!span) return;
 
         if (commentBefore) {
-            var comment = document.createElement('DIV');
-            comment.className = 'settings-comment';
-            comment.innerHTML = commentBefore;
-            span.parentElement.insertBefore(document.createTextNode('\xa0'), span);
-            span.parentElement.insertBefore(comment, span);
-            span.parentElement.insertBefore(document.createTextNode('\xa0'), span);
+            var comment = createElement('DIV', 'settings-comment', {innerHTML: commentBefore})
+            span.before(document.createTextNode('\xa0'))
+            span.before(comment)
+            span.before(document.createTextNode('\xa0'))
         }
         if (commentAfter) {
-            comment = document.createElement('DIV');
-            comment.className = 'settings-comment';
-            comment.innerHTML = commentAfter;
-            span.parentElement.insertBefore(comment, span.nextSibling);
-            span.parentElement.insertBefore(document.createTextNode('\xa0'), span.nextSibling);
+            var comment = createElement('DIV', 'settings-comment', {innerHTML: commentAfter})
+            span.after(comment)
+            span.after(document.createTextNode('\xa0'))
         }
     });
 });
 
 function settingsHintsShowQuicksettings() {
     requestGet("./internal/quicksettings-hint", {}, function(data) {
-        var table = document.createElement('table');
-        table.className = 'popup-table';
+        var table = createElement('table', 'popup-table')
 
         data.forEach(function(obj) {
-            var tr = document.createElement('tr');
-            var td = document.createElement('td');
-            td.textContent = obj.name;
-            tr.appendChild(td);
-
-            td = document.createElement('td');
-            td.textContent = obj.label;
-            tr.appendChild(td);
-
-            table.appendChild(tr);
+            var tr = createElement('tr', '', table)
+            createElement('td', '', {textContent: obj.name}, tr)
+            createElement('td', '', {textContent: obj.label}, tr)
         });
 
-        popup(table);
-    });
+        popup(table)
+    })
 }

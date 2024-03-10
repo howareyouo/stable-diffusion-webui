@@ -11,8 +11,7 @@ div.gradio-image button[aria-label="Edit"] {
     --block-background-fill: transparent;
     --button-secondary-text-color: var(--neutral-400);
     --block-title-text-color: var(--neutral-300);
-    --input-background-fill: var(--neutral-800);
-    --input-background-fill: #222;
+    --input-background-fill: color-mix(in srgb, var(--neutral-800) 80%, #000);
     --body-text-color: var(--neutral-300);
     --tool-button-size: 2.5rem;
     --font: 'Noto Sans';

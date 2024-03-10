@@ -26,8 +26,6 @@ var contextMenuInit = function() {
         contextMenu.style.top = posy + 'px';
         contextMenu.style.left = posx + 'px';
 
-
-
         const contextMenuList = document.createElement('ul');
         contextMenuList.className = 'context-menu-items';
         contextMenu.append(contextMenuList);

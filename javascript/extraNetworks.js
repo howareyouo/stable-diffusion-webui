@@ -1,27 +1,28 @@
 const trim = s => s.replace(/^ +| +$/g, '')
 
-function formatPrompt (textarea) {
-    let text = textarea.value.trim()
-    let endComma = text.endsWith(',')
-    text = text
-        .replaceAll(/ {2,}/g, ' ')
-        .replaceAll(/([(<])[, ]*/g, '$1')
-        .replaceAll(/[, ]*([>)])/g, '$1')
-        .split('\n')
-        .map(s => s
-            .split(',')
-            .map(trim)
-            .filter(Boolean)
-            .join(', ')
-        ).join(',\n')
-    if (endComma) {
-        text += ', '
-    }
-    textarea.value = text
-}
-
 function setupExtraNetworksForTab(tabname) {
     let tabnav = $(`#${tabname}_extra_tabs > .tab-nav`)
+    
+    function formatPrompt (textarea) {
+        let text = textarea.value.trim()
+        let endComma = text.endsWith(',')
+        text = text
+            .replaceAll(/ {2,}/g, ' ')
+            .replaceAll(/\s*:\s*/g, ':')
+            .replaceAll(/([(<])[, ]*/g, '$1')
+            .replaceAll(/[, ]*([>)])/g, '$1')
+            .split('\n')
+            .map(s => s
+                .split(',')
+                .map(trim)
+                .filter(Boolean)
+                .join(', ')
+            ).join(',\n')
+        if (endComma) {
+            text += ', '
+        }
+        textarea.value = text
+    }
 
     function registerPrompt(tabname, id) {
         let textarea = $(`#${id} textarea`)
@@ -32,11 +33,8 @@ function setupExtraNetworksForTab(tabname) {
             activePromptTextarea[tabname] = textarea
         })
         textarea.on('blur', () => {
-            textarea.start = textarea.selectionStart
-            textarea.end = textarea.selectionEnd
             formatPrompt(textarea)
             updateInput(textarea)
-            textarea.setSelectionRange(textarea.start, textarea.end)
         })
     }
 
@@ -87,7 +85,7 @@ function setupExtraNetworksForTab(tabname) {
         extraNetworksApplyFilter[page.id] = applyFilter
         extraNetworksApplySort[page.id] = applySort
 
-        tabnav.insertBefore($('.extra-network-control', page), tabnav.lastElementChild)
+        tabnav.lastElementChild.before($('.extra-network-control', page))
 
         if (page.style.display != "none") {
             extraNetworksShowControlsForPage(tabname, page.id)
@@ -107,15 +105,15 @@ function extraNetworksMovePromptToTab(tabname, id, showPrompt, showNegativePromp
     let elem = id ? _(id) : null
 
     if (showNegativePrompt && elem) {
-        elem.insertBefore(negPrompt, elem.firstChild);
+        elem.prepend(negPrompt)
     } else {
-        promptContainer.insertBefore(negPrompt, promptContainer.firstChild);
+        promptContainer.prepend(negPrompt)
     }
 
     if (showPrompt && elem) {
-        elem.insertBefore(prompt, elem.firstChild);
+        elem.prepend(prompt)
     } else {
-        promptContainer.insertBefore(prompt, promptContainer.firstChild);
+        promptContainer.prepend(prompt)
     }
 
     if (elem) {
@@ -212,10 +210,10 @@ function updatePromptArea(text, textarea, isNeg) {
 
 function cardClicked(tabname, textToAdd, textToAddNegative, allowNegativePrompt) {
     let textarea = allowNegativePrompt ? activePromptTextarea[tabname] : $(`#${tabname}_prompt textarea`)
-    if (textarea.start != textarea.end) {
-        textarea.setRangeText(textToAdd, textarea.start, textarea.end, 'select')
-        updateInput(textarea)
+    if (textarea.selectionStart != textarea.selectionEnd) {
+        textarea.setRangeText(textToAdd, textarea.selectionStart, textarea.selectionEnd, 'select')
         textarea.focus()
+        textarea.blur()
     } else if (textToAddNegative) {
         updatePromptArea(textToAdd, textarea);
         updatePromptArea(textToAddNegative, $(`#${tabname}_neg_prompt textarea`), true)
@@ -226,7 +224,6 @@ function cardClicked(tabname, textToAdd, textToAddNegative, allowNegativePrompt)
 
 function saveCardPreview(evt, tabname, filename) {
     let textarea = $('#' + tabname + '_preview_filename textarea')
-
     updateInput(textarea, filename)
 
     _(tabname + '_save_preview').click()
@@ -253,8 +250,7 @@ function popup (elem) {
         createElement('div', 'global-popup-close', {onclick: closePopup, title: 'Close'}, globalPopup)
 
         globalPopupBody = createElement('div', 'global-popup-inner', {
-            onclick: e => e.stopPropagation(), 
-            title: 'Close'
+            onclick: e => e.stopPropagation()
         }, globalPopup)
     }
     globalPopupBody.replaceChildren(elem)
@@ -271,8 +267,7 @@ function popupId(id) {
 }
 
 function extraNetworksShowMetadata (textContent) {
-    let elem = createElement('pre', 'popup-metadata', {textContent})
-    popup(elem)
+    popup(createElement('pre', 'popup-metadata', {textContent}))
 }
 
 function requestGet (url, data, handler, errorHandler) {
@@ -282,8 +277,7 @@ function requestGet (url, data, handler, errorHandler) {
         if (xhr.readyState !== 4) return
         if (xhr.status === 200) {
             try {
-                let js = JSON.parse(xhr.responseText)
-                handler(js)
+                handler(JSON.parse(xhr.responseText))
             } catch (error) {
                 console.error(error)
                 errorHandler()
@@ -295,11 +289,11 @@ function requestGet (url, data, handler, errorHandler) {
     xhr.send()
 }
 
-function extraNetworksRequestMetadata(event, extraPage, cardName) {
+function extraNetworksRequestMetadata(event, page, item) {
     let showError = function () {
         extraNetworksShowMetadata('there was an error getting metadata')
     }
-    requestGet("./sd_extra_networks/metadata", {page: extraPage, item: cardName}, function(data) {
+    requestGet("./sd_extra_networks/metadata", {page, item}, function(data) {
         if (data && data.metadata) {
             extraNetworksShowMetadata(data.metadata)
         } else {
@@ -317,11 +311,11 @@ function extraNetworksEditUserMetadata(event, tabname, extraPage, cardName) {
 
     let editor = extraPageUserMetadataEditors[id]
     if (!editor) {
-        editor = {};
-        editor.page = _(id);
-        editor.nameTextarea = $("#" + id + "_name" + ' textarea');
-        editor.button = $("#" + id + "_button");
-        extraPageUserMetadataEditors[id] = editor;
+        editor = {}
+        editor.page = _(id)
+        editor.nameTextarea = $("#" + id + "_name" + ' textarea')
+        editor.button = $("#" + id + "_button")
+        extraPageUserMetadataEditors[id] = editor
     }
     updateInput(editor.nameTextarea, cardName)
     editor.button.click()

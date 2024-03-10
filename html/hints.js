@@ -140,8 +140,7 @@ function updateTooltip(element) {
     }
 
     if (tooltip) {
-        console.log(tooltip)
-        element.title = tooltip;
+        element.title = tooltip
     }
 }
 

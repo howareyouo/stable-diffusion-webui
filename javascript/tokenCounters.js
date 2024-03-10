@@ -21,12 +21,12 @@ function update_img2img_tokens(...args) {
 }
 
 function update_token_counter(button_id) {
-    promptTokenCountUpdateFunctions[button_id]?.();
+    promptTokenCountUpdateFunctions[button_id]?.()
 }
 
 
 function recalculatePromptTokens(name) {
-    promptTokenCountUpdateFunctions[name]?.();
+    promptTokenCountUpdateFunctions[name]?.()
 }
 
 function recalculate_prompts_txt2img() {
@@ -52,7 +52,7 @@ function setupTokenCounting(id, id_counter, id_button) {
         return;
     }
 
-    prompt.parentElement.insertBefore(counter, prompt);
+    prompt.before(counter)
     prompt.parentElement.style.position = "relative";
 
     var func = onEdit(id, textarea, 800, function() {

@@ -120,4 +120,4 @@ class UiPromptStyles:
             inputs=[self.main_ui_prompt, self.main_ui_negative_prompt, self.dropdown],
             outputs=[self.main_ui_prompt, self.main_ui_negative_prompt, self.dropdown],
             show_progress=False,
-        ).then(fn=None, _js="function(){update_"+self.tabname+"_tokens(); closePopup();}", show_progress=False)
+        ).then(fn=None, _js="() => {update_" + self.tabname + "_tokens(); closePopup();}", show_progress=False)
