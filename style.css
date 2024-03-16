@@ -3,15 +3,16 @@ div.gradio-image button[aria-label="Edit"] {
     display: none;
 }
 
-
 /* general gradio fixes */
 :root[lang], .dark {
     --checkbox-label-gap: 0.25em 0.1em;
     --section-header-text-size: 12pt;
-    --block-background-fill: transparent;
-    --button-secondary-text-color: var(--neutral-400);
     --block-title-text-color: var(--neutral-300);
+    --block-background-fill: transparent;
+    --block-border-width: 0;
+    --button-secondary-text-color: var(--neutral-400);
     --input-background-fill: color-mix(in srgb, var(--neutral-800) 80%, #000);
+    --input-border-width: 0;
     --body-text-color: var(--neutral-300);
     --tool-button-size: 2.5rem;
     --font: 'Noto Sans';
@@ -42,18 +43,6 @@ div.form{
     background: transparent;
     overflow: visible;
     gap: 0.5em;
-}
-
-.block.gradio-dropdown,
-.block.gradio-slider,
-.block.gradio-checkbox,
-.block.gradio-textbox,
-.block.gradio-radio,
-.block.gradio-checkboxgroup,
-.block.gradio-number,
-.block.gradio-colorpicker {
-    border-width: 0 !important;
-    box-shadow: none !important;
 }
 
 div.gradio-group, div.styler{
@@ -160,7 +149,6 @@ div.gradio-container, .block.gradio-textbox, div.gradio-group, div.gradio-dropdo
 
 
 /* general styled components */
-
 button.custom-button,
 .gradio-button.tool {
     border-radius: var(--button-large-radius);
@@ -299,9 +287,6 @@ input[type="checkbox"].input-accordion-checkbox{
     font-weight: bold;
 }
 
-.performance p.time {
-}
-
 .performance p.vram {
     margin-left: auto;
 }
@@ -347,7 +332,9 @@ input[type="checkbox"].input-accordion-checkbox{
 .generate-box{
     position: relative;
 }
-.gradio-button.generate-box-skip, .gradio-button.generate-box-interrupt, .gradio-button.generate-box-interrupting{
+.gradio-button.generate-box-skip, 
+.gradio-button.generate-box-interrupt, 
+.gradio-button.generate-box-interrupting{
     position: absolute;
     width: 50%;
     height: 100%;
@@ -529,7 +516,12 @@ table.popup-table .link{
     color: var(--body-text-color);
 }
 
-#settings .gradio-textbox, #settings .gradio-slider, #settings .gradio-number, #settings .gradio-dropdown, #settings .gradio-checkboxgroup, #settings .gradio-radio{
+#settings .gradio-textbox, 
+#settings .gradio-slider, 
+#settings .gradio-number, 
+#settings .gradio-dropdown, 
+#settings .gradio-checkboxgroup, 
+#settings .gradio-radio{
     margin-top: 0.75em;
 }
 
@@ -837,7 +829,7 @@ table.popup-table .link{
     max-width: 16em;
 }
 
-#tab_extensions input[disabled="disabled"]{
+#tab_extensions input[disabled]{
     opacity: 0.5;
 }
 
@@ -916,39 +908,12 @@ footer {
 }
 
 .extra-networks > div.tab-nav{
-    min-height: 2.5rem;
     border-style: dashed;
 }
 
 .extra-networks-controls-div{
     align-self: center;
     margin-left: 1rem;
-}
-
-.extra-networks > div > [id *= '_extra_']{
-    margin: 0.3em;
-}
-
-.extra-networks .tab-nav .search,
-.extra-networks .tab-nav .sort
-{
-    margin: 0.3em;
-    align-self: center;
-    width: auto;
-}
-
-.extra-networks .tab-nav .search {
-    width: 16em;
-    max-width: 16em;
-}
-
-.extra-networks .tab-nav .sort {
-    width: 12em;
-    max-width: 12em;
-}
-
-#txt2img_extra_view, #img2img_extra_view {
-    width: auto;
 }
 
 .extra-network-html .nocards{
@@ -962,23 +927,14 @@ footer {
 }
 
 .card .button-row{
-    display: inline-flex;
-    visibility: hidden;
-    color: white;
-}
-
-.card .button-row {
     position: absolute;
-    right: 0;
+    display: none;
     z-index: 1;
+    right: 0;
 }
 
 .card:hover .button-row{
-    visibility: visible;
-}
-
-.card-button{
-    color: white;
+    display: inline-flex
 }
 
 .extra-network-html .copy-path-button::before {
@@ -994,11 +950,13 @@ footer {
 }
 
 .card-button {
-    width: 1.5em;
     text-shadow: 2px 2px 3px black;
-    color: white;
     padding: 0.25em 0.1em;
+    line-height: 1;
     font-size: 2rem;
+    width: 1.5em;
+    color: white;
+    transition: color .5s;
 }
 
 .card-button:hover{
@@ -1036,8 +994,8 @@ footer {
 .card .actions{
     position: absolute;
     bottom: 0;
-    left: 0;
     right: 0;
+    left: 0;
     padding: 0.5em;
     background: rgba(0,0,0,0.5);
     box-shadow: 0 0 0.25em 0.25em rgba(0,0,0,0.5);
@@ -1063,17 +1021,17 @@ footer {
 }
 
 .card .actions .additional {
-    display: none;
     justify-content: center;
     align-items: center;
     font-size: 1.85em;
+    display: none;
 }
 
 .card .actions:hover .additional {
     display: flex
 }
 
-.card .preview{
+.card .preview {
     position: absolute;
     object-fit: cover;
     width: 100%;
@@ -1222,7 +1180,7 @@ div.accordions > div.input-accordion.input-accordion-open{
     cursor: pointer;
     height: 1rem;
     width: 1rem;
-    mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>');
+    mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="4"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>');
     mask-repeat: no-repeat;
     mask-position: center center;
     mask-size: 100%;
@@ -1261,11 +1219,11 @@ option {
 }
 
 .extra-network-control .extra-network-control-sort-dir[data-sortdir="Ascending"] .extra-network-control-sort-dir-icon {
-    mask-image: url('data:image/svg+xml,<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g stroke-width="0"></g><g stroke-linecap="round" stroke-linejoin="round"></g><g><path d="M13 12H21M13 8H21M13 16H21M6 7V17M6 7L3 10M6 7L9 10" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></g></svg>');
+    mask-image: url('data:image/svg+xml,<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g><path d="M13 12H21M13 8H21M13 16H21M6 7V17M6 7L3 10M6 7L9 10" stroke="black" stroke-width="2"></path></g></svg>');
 }
 
 .extra-network-control .extra-network-control-sort-dir[data-sortdir="Descending"] .extra-network-control-sort-dir-icon {
-    mask-image: url('data:image/svg+xml,<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g stroke-width="0"></g><g stroke-linecap="round" stroke-linejoin="round"></g><g><path d="M13 12H21M13 8H21M13 16H21M6 7V17M6 17L3 14M6 17L9 14" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></g></svg>');
+    mask-image: url('data:image/svg+xml,<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g><path d="M13 12H21M13 8H21M13 16H21M6 7V17M6 17L3 14M6 17L9 14" stroke="black" stroke-width="2"></path></g></svg>');
 }
 
 .extra-network-control .extra-network-control-enabled {
@@ -1288,7 +1246,7 @@ option {
 .extra-network-control .extra-network-control-refresh .extra-network-control-refresh-icon {
     height: 1.25rem;
     width: 1.25rem;
-    mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38"/></svg>');
+    mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38"/></svg>');
     mask-repeat: no-repeat;
     mask-position: center center;
     mask-size: 100%;

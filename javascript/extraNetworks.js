@@ -33,6 +33,8 @@ function setupExtraNetworksForTab(tabname) {
             activePromptTextarea[tabname] = textarea
         })
         textarea.on('blur', () => {
+            textarea.start = textarea.selectionStart
+            textarea.end = textarea.selectionEnd
             formatPrompt(textarea)
             updateInput(textarea)
         })
@@ -210,8 +212,8 @@ function updatePromptArea(text, textarea, isNeg) {
 
 function cardClicked(tabname, textToAdd, textToAddNegative, allowNegativePrompt) {
     let textarea = allowNegativePrompt ? activePromptTextarea[tabname] : $(`#${tabname}_prompt textarea`)
-    if (textarea.selectionStart != textarea.selectionEnd) {
-        textarea.setRangeText(textToAdd, textarea.selectionStart, textarea.selectionEnd, 'select')
+    if (textarea.start != textarea.end) {
+        textarea.setRangeText(textToAdd, textarea.start, textarea.end, 'select')
         textarea.focus()
         textarea.blur()
     } else if (textToAddNegative) {
