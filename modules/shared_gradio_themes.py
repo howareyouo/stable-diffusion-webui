@@ -10,11 +10,9 @@ from modules.paths_internal import script_path
 gradio_hf_hub_themes = [
     "gradio/base",
     "Medguy/base2",
-    "abidlabs/test-yellow",
-    "abidlabs/pakistan",
     "abidlabs/Lime",
-    "Ama434/neutral-barlow",
     "victorrauwcc/RCC",
+    "Ama434/neutral-barlow",
     "reilnuud/polite",
     "aliabid94/new-theme",
 ]
@@ -25,7 +23,7 @@ def reload_gradio_theme(theme_name=None):
         theme_name = shared.opts.gradio_theme
 
     default_theme_args = dict(
-        font=["Source Sans Pro", 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        font=["Noto Sans", "Source Sans Pro", 'ui-sans-serif', 'system-ui', 'sans-serif'],
         font_mono=['IBM Plex Mono', 'ui-monospace', 'Consolas', 'monospace'],
     )
 
