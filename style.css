@@ -229,13 +229,13 @@ input[type="checkbox"].input-accordion-checkbox{
 
 .block.token-counter span{
     background: var(--input-background-fill) !important;
-    box-shadow: 0 0 0 .3em rgba(192,192,192,.15), inset 0 0 .6em rgba(192,192,192,075);
+    box-shadow: 0 0 0 .3em rgba(192,192,192,.15), inset 0 0 .6em rgba(192,192,192,.075);
     border: 2px solid rgba(192,192,192,.4) !important;
     border-radius: .4em;
 }
 
 .block.token-counter.error span{
-    box-shadow: 0 0 0 .3em rgba(255,0,0,.15), inset 0 0 .6em rgba(255,0,0,075);
+    box-shadow: 0 0 .0 .3em rgba(255,0,0,.15), inset 0 0 .6em rgba(255,0,0,.075);
     border: 2px solid rgba(255,0,0,.4) !important;
 }
 
@@ -434,7 +434,10 @@ div.toprow-compact-tools{
     background: none;
 }
 #quicksettings > div.gradio-dropdown{
-    min-width: 24em !important;
+    min-width: 24em !important
+}
+#setting_sd_model_checkpoint {
+    min-width: 34em !important
 }
 #quicksettings label span {
     display: none;

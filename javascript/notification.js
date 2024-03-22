@@ -42,10 +42,14 @@ onAfterUiUpdate(function() {
         image: headImg,
     })
 
-    notification.onclick = function(_) {
+    notification.onclick = function() {
         parent.focus()
         this.close()
     }
+
+    window.on('focus', function() {
+        notification.close()
+    })
 
     setTimeout(() => notification.close(), 9999)
 });
