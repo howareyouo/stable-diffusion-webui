@@ -1,5 +1,5 @@
 import collections
-import os.path
+import os
 import sys
 import threading
 
@@ -7,13 +7,12 @@ import torch
 import re
 import safetensors.torch
 from omegaconf import OmegaConf, ListConfig
-from os import mkdir
 from urllib import request
 import ldm.modules.midas as midas
 
 from ldm.util import instantiate_from_config
 
-from modules import paths, shared, modelloader, devices, script_callbacks, sd_vae, sd_disable_initialization, errors, hashes, sd_models_config, sd_unet, sd_models_xl, cache, extra_networks, processing, lowvram, sd_hijack, patches, util
+from modules import paths, shared, modelloader, devices, script_callbacks, sd_vae, sd_disable_initialization, errors, hashes, sd_models_config, sd_unet, sd_models_xl, cache, extra_networks, processing, lowvram, sd_hijack, patches
 from modules.timer import Timer
 from modules.shared import opts
 import tomesd
@@ -151,7 +150,7 @@ def list_models():
     if shared.cmd_opts.no_download_sd_model or cmd_ckpt != shared.sd_model_file or os.path.exists(cmd_ckpt):
         model_url = None
     else:
-        model_url = "https://huggingface.co/runwayml/stable-diffusion-v1-5/resolve/main/v1-5-pruned-emaonly.safetensors"
+        model_url = f"{shared.hf_endpoint}/runwayml/stable-diffusion-v1-5/resolve/main/v1-5-pruned-emaonly.safetensors"
 
     model_list = modelloader.load_models(model_path=model_path, model_url=model_url, command_path=shared.cmd_opts.ckpt_dir, ext_filter=[".ckpt", ".safetensors"], download_name="v1-5-pruned-emaonly.safetensors", ext_blacklist=[".vae.ckpt", ".vae.safetensors"])
 
@@ -226,7 +225,7 @@ def select_checkpoint():
 
     checkpoint_info = next(iter(checkpoints_list.values()))
     if model_checkpoint is not None:
-        print(f"Checkpoint {model_checkpoint} not found; loading fallback {checkpoint_info.name}", file=sys.stderr)
+        print(f"Checkpoint {model_checkpoint} not found; loading fallback {checkpoint_info.title}", file=sys.stderr)
 
     return checkpoint_info
 
@@ -318,7 +317,7 @@ def read_state_dict(checkpoint_file, print_global_state=False, map_location=None
 
 def get_checkpoint_state_dict(checkpoint_info: CheckpointInfo, timer):
     sd_model_hash = checkpoint_info.calculate_shorthash()
-    timer.record("hashing")
+    timer.record("calculate hash")
 
     if checkpoint_info in checkpoints_loaded:
         # use checkpoint cache
@@ -327,10 +326,9 @@ def get_checkpoint_state_dict(checkpoint_info: CheckpointInfo, timer):
         checkpoints_loaded.move_to_end(checkpoint_info)
         return checkpoints_loaded[checkpoint_info]
 
-    print(f"Loading weights [{sd_model_hash}] from {util.shortern(checkpoint_info.filename)}")
+    print(f"Loading weights [{sd_model_hash}] from {checkpoint_info.filename}")
     res = read_state_dict(checkpoint_info.filename)
-    # timer.record("load weights from disk")
-    timer.record("load weights")
+    timer.record("load weights from disk")
 
     return res
 
@@ -393,7 +391,7 @@ def load_model_weights(model, checkpoint_info: CheckpointInfo, state_dict, timer
         checkpoints_loaded[checkpoint_info] = state_dict.copy()
 
     model.load_state_dict(state_dict, strict=False)
-    timer.record("apply weights")
+    timer.record("apply weights to model")
 
     del state_dict
 
@@ -509,7 +507,7 @@ def enable_midas_autodownload():
         path = midas.api.ISL_PATHS[model_type]
         if not os.path.exists(path):
             if not os.path.exists(midas_path):
-                mkdir(midas_path)
+                os.mkdir(midas_path)
 
             print(f"Downloading midas model weights for {model_type} to {path}")
             request.urlretrieve(midas_urls[model_type], path)
@@ -751,7 +749,7 @@ def load_model(checkpoint_info=None, already_loaded_state_dict=None):
     timer.record("load weights from state dict")
 
     send_model_to_device(sd_model)
-    timer.record("move to device")
+    timer.record("move model to device")
 
     sd_hijack.model_hijack.hijack(sd_model)
 
@@ -763,7 +761,7 @@ def load_model(checkpoint_info=None, already_loaded_state_dict=None):
 
     sd_hijack.model_hijack.embedding_db.load_textual_inversion_embeddings(force_reload=True)  # Reload embeddings after model load as they may or may not fit the model
 
-    timer.record("load embeddings")
+    timer.record("load textual inversion embeddings")
 
     script_callbacks.model_loaded_callback(sd_model)
 
@@ -785,8 +783,15 @@ def reuse_model_from_already_loaded(sd_model, checkpoint_info, timer):
     If it is loaded, returns that (moving it to GPU if necessary, and moving the currently loadded model to CPU if necessary).
     If not, returns the model that can be used to load weights from checkpoint_info's file.
     If no such model exists, returns None.
-    Additionaly deletes loaded models that are over the limit set in settings (sd_checkpoints_limit).
+    Additionally deletes loaded models that are over the limit set in settings (sd_checkpoints_limit).
     """
+
+    if sd_model is not None and sd_model.sd_checkpoint_info.filename == checkpoint_info.filename:
+        return sd_model
+
+    if shared.opts.sd_checkpoints_keep_in_cpu:
+        send_model_to_cpu(sd_model)
+        timer.record("send model to cpu")
 
     already_loaded = None
     for i in reversed(range(len(model_data.loaded_sd_models))):
@@ -797,17 +802,13 @@ def reuse_model_from_already_loaded(sd_model, checkpoint_info, timer):
 
         if len(model_data.loaded_sd_models) > shared.opts.sd_checkpoints_limit > 0:
             print(f"Unloading model {len(model_data.loaded_sd_models)} over the limit of {shared.opts.sd_checkpoints_limit}: {loaded_model.sd_checkpoint_info.title}")
-            model_data.loaded_sd_models.pop()
+            del model_data.loaded_sd_models[i]
             send_model_to_trash(loaded_model)
-            timer.record("send to trash")
-
-        if shared.opts.sd_checkpoints_keep_in_cpu:
-            send_model_to_cpu(sd_model)
-            timer.record("send to cpu")
+            timer.record("send model to trash")
 
     if already_loaded is not None:
         send_model_to_device(already_loaded)
-        timer.record("send to device")
+        timer.record("send model to device")
 
         model_data.set_sd_model(already_loaded, already_loaded=True)
 
@@ -815,11 +816,11 @@ def reuse_model_from_already_loaded(sd_model, checkpoint_info, timer):
             shared.opts.data["sd_model_checkpoint"] = already_loaded.sd_checkpoint_info.title
             shared.opts.data["sd_checkpoint_hash"] = already_loaded.sd_checkpoint_info.sha256
 
-        print(f"Using loaded model {util.yy(already_loaded.sd_checkpoint_info.name)}: done in {timer.summary()}")
+        print(f"Using already loaded model {already_loaded.sd_checkpoint_info.title}: done in {timer.summary()}")
         sd_vae.reload_vae_weights(already_loaded)
         return model_data.sd_model
     elif shared.opts.sd_checkpoints_limit > 1 and len(model_data.loaded_sd_models) < shared.opts.sd_checkpoints_limit:
-        print(f"Loading model {util.yy(checkpoint_info.name)} ({len(model_data.loaded_sd_models) + 1} out of {shared.opts.sd_checkpoints_limit})")
+        print(f"Loading model {checkpoint_info.title} ({len(model_data.loaded_sd_models) + 1} out of {shared.opts.sd_checkpoints_limit})")
 
         model_data.sd_model = None
         load_model(checkpoint_info)
@@ -832,7 +833,7 @@ def reuse_model_from_already_loaded(sd_model, checkpoint_info, timer):
         sd_vae.loaded_vae_file = getattr(sd_model, "loaded_vae_file", None)
         sd_vae.checkpoint_info = sd_model.sd_checkpoint_info
 
-        print(f"Reusing loaded model {util.yy(sd_model.sd_checkpoint_info.name)} to load {util.y(checkpoint_info.name)}")
+        print(f"Reusing loaded model {sd_model.sd_checkpoint_info.title} to load {checkpoint_info.title}")
         return sd_model
     else:
         return None
@@ -890,7 +891,7 @@ def reload_model_weights(sd_model=None, info=None, forced_reload=False):
 
         if not sd_model.lowvram:
             sd_model.to(devices.device)
-            timer.record("move to device")
+            timer.record("move model to device")
 
         script_callbacks.model_loaded_callback(sd_model)
         timer.record("script callbacks")

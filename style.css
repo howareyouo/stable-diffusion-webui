@@ -280,9 +280,9 @@ input[type="checkbox"].input-accordion-checkbox{
     margin: 0;
 }
 
-.performance p.time, 
-.performance p.vram, 
-.performance p.time abbr, 
+.performance p.time,
+.performance p.vram,
+.performance p.time abbr,
 .performance p.vram abbr {
     font-weight: bold;
 }
@@ -332,8 +332,8 @@ input[type="checkbox"].input-accordion-checkbox{
 .generate-box{
     position: relative;
 }
-.gradio-button.generate-box-skip, 
-.gradio-button.generate-box-interrupt, 
+.gradio-button.generate-box-skip,
+.gradio-button.generate-box-interrupt,
 .gradio-button.generate-box-interrupting{
     position: absolute;
     width: 50%;
@@ -515,11 +515,11 @@ table.popup-table .link{
     color: var(--body-text-color);
 }
 
-#settings .gradio-textbox, 
-#settings .gradio-slider, 
-#settings .gradio-number, 
-#settings .gradio-dropdown, 
-#settings .gradio-checkboxgroup, 
+#settings .gradio-textbox,
+#settings .gradio-slider,
+#settings .gradio-number,
+#settings .gradio-dropdown,
+#settings .gradio-checkboxgroup,
 #settings .gradio-radio{
     margin-top: .75em;
 }
@@ -534,6 +534,10 @@ table.popup-table .link{
 
 .settings-comment .info{
     opacity: .75;
+}
+
+.settings-comment .info ol{
+    margin: 0.4em 0 0.8em 1em;
 }
 
 #sysinfo_download a.sysinfo_big_link{
@@ -1128,7 +1132,7 @@ div.accordions > div.input-accordion.input-accordion-open{
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     grid-gap: .5em;
 }
-/* 
+/*
 .extra-network-html .extra-network-cards::-webkit-scrollbar {
     background-color: transparent;
     width: 16px;
@@ -1170,6 +1174,12 @@ div.accordions > div.input-accordion.input-accordion-open{
     padding-left: 2em;
     line-height: 1;
 }
+
+
+.extra-network-control .extra-network-control--search .extra-network-control--search-text::placeholder {
+    color: var(--input-placeholder-color);
+}
+
 
 /* <input> clear button (x on right side) styling */
 .extra-network-control .extra-network-control-search::-webkit-search-cancel-button {
@@ -1225,11 +1235,16 @@ option {
 }
 
 .extra-network-control .extra-network-control-enabled {
-    background-color: rgba(0, 0, 0, .15);
+    background-color: rgba(0, 0, 0, .1);
+    border-radius: 0.25rem;
 }
 
 .dark .extra-network-control .extra-network-control-enabled {
     background-color: rgba(255, 255, 255, .15);
+}
+
+.extra-network-control .extra-network-control--enabled .extra-network-control--icon{
+    background-color: var(--button-secondary-text-color);
 }
 
 /* ==== REFRESH ICON ACTIONS ==== */
