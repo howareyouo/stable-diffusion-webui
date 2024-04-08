@@ -421,23 +421,19 @@ div.toprow-compact-tools{
 
 /* settings */
 #quicksettings {
-    align-items: end;
+    align-items: end
 }
 
 #quicksettings > div, #quicksettings > fieldset{
     max-width: 36em;
     width: fit-content;
     flex: 0 1 fit-content;
-    padding: 0;
-    border: none;
-    box-shadow: none;
-    background: none;
 }
 #quicksettings > div.gradio-dropdown{
-    min-width: 24em !important
+    min-width: 25em !important
 }
-#setting_sd_model_checkpoint {
-    min-width: 34em !important
+#quicksettings > #setting_sd_model_checkpoint {
+    min-width: 35em !important
 }
 #quicksettings label span {
     display: none;

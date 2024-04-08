@@ -205,7 +205,12 @@ function tryToRemoveExtraNetworkFromPrompt(textarea, text, isNeg) {
 function updatePromptArea(text, textarea, isNeg) {
     if (!tryToRemoveExtraNetworkFromPrompt(textarea, text, isNeg)) {
         let add = trim(opts.extra_networks_add_text_separator)
-        textarea.value += (textarea.value.endsWith(add) ? '' : add) + ' ' + text
+        let val = trim(textarea.value)
+        if (!val.endsWith(add)) {
+            val += add
+        }
+        val +=  ' ' + text
+        textarea.value = val
     }
     updateInput(textarea)
 }

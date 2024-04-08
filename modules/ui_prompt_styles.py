@@ -78,7 +78,7 @@ class UiPromptStyles:
 
             with gr.Row():
                 self.save = gr.Button('Save', variant='primary', elem_id=f'{tabname}_edit_style_save', visible=False)
-                self.delete = gr.Button('Delete', variant='primary', elem_id=f'{tabname}_edit_style_delete', visible=False)
+                self.delete = gr.Button('Delete', variant='stop', elem_id=f'{tabname}_edit_style_delete', visible=False)
                 self.close = gr.Button('Close', variant='secondary', elem_id=f'{tabname}_edit_style_close')
 
         self.selection.change(
