@@ -70,6 +70,7 @@ div.compact{
     min-width: fit-content;
     max-width: inherit;
     white-space: nowrap;
+    box-shadow: 0 0 2px rgb(222 222 222 / 20%);
 }
 
 @media (pointer:fine) {
@@ -86,8 +87,12 @@ div.compact{
     background-color: var(--neutral-900);
 }
 
-.gradio-dropdown div.wrap.wrap.wrap.wrap{
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+.options .item:hover {
+    background-color: var(--primary-700)
+}
+
+.options .selected {
+    background-color: var(--primary-800) !important
 }
 
 .gradio-dropdown:not(.multiselect) .wrap-inner.wrap-inner.wrap-inner{
@@ -1272,14 +1277,6 @@ option {
 
 .extra-network-control label:active {
     filter: brightness(1.1) sepia(1)
-}
-
-.options .item:hover {
-    background-color: var(--primary-700)
-}
-
-.options .selected {
-    background-color: var(--primary-800) !important
 }
 
 .meta-text {

@@ -12,7 +12,7 @@ import ldm.modules.midas as midas
 
 from ldm.util import instantiate_from_config
 
-from modules import paths, shared, modelloader, devices, script_callbacks, sd_vae, sd_disable_initialization, errors, hashes, sd_models_config, sd_unet, sd_models_xl, cache, extra_networks, processing, lowvram, sd_hijack, patches
+from modules import paths, shared, modelloader, devices, script_callbacks, sd_vae, sd_disable_initialization, errors, hashes, sd_models_config, sd_unet, sd_models_xl, cache, extra_networks, processing, lowvram, sd_hijack, patches, util
 from modules.timer import Timer
 from modules.shared import opts
 import tomesd
@@ -326,7 +326,7 @@ def get_checkpoint_state_dict(checkpoint_info: CheckpointInfo, timer):
         checkpoints_loaded.move_to_end(checkpoint_info)
         return checkpoints_loaded[checkpoint_info]
 
-    print(f"Loading weights [{sd_model_hash}] from {checkpoint_info.filename}")
+    print(f"Loading weights [{sd_model_hash}] from {util.shortern(checkpoint_info.filename)}")
     res = read_state_dict(checkpoint_info.filename)
     timer.record("load weights from disk")
 
@@ -761,7 +761,7 @@ def load_model(checkpoint_info=None, already_loaded_state_dict=None):
 
     sd_hijack.model_hijack.embedding_db.load_textual_inversion_embeddings(force_reload=True)  # Reload embeddings after model load as they may or may not fit the model
 
-    timer.record("load textual inversion embeddings")
+    timer.record("load embeddings")
 
     script_callbacks.model_loaded_callback(sd_model)
 
@@ -770,7 +770,7 @@ def load_model(checkpoint_info=None, already_loaded_state_dict=None):
     with devices.autocast(), torch.no_grad():
         sd_model.cond_stage_model_empty_prompt = get_empty_cond(sd_model)
 
-    timer.record("calculate empty prompt")
+    timer.record("calc empty prompt")
 
     print(f"Model loaded in {timer.summary()}.")
 
@@ -791,7 +791,7 @@ def reuse_model_from_already_loaded(sd_model, checkpoint_info, timer):
 
     if shared.opts.sd_checkpoints_keep_in_cpu:
         send_model_to_cpu(sd_model)
-        timer.record("send model to cpu")
+        timer.record("send to cpu")
 
     already_loaded = None
     for i in reversed(range(len(model_data.loaded_sd_models))):
@@ -801,14 +801,14 @@ def reuse_model_from_already_loaded(sd_model, checkpoint_info, timer):
             continue
 
         if len(model_data.loaded_sd_models) > shared.opts.sd_checkpoints_limit > 0:
-            print(f"Unloading model {len(model_data.loaded_sd_models)} over the limit of {shared.opts.sd_checkpoints_limit}: {loaded_model.sd_checkpoint_info.title}")
+            print(f"Unloading model {len(model_data.loaded_sd_models)} over the limit of {shared.opts.sd_checkpoints_limit}: {loaded_model.sd_checkpoint_info.name}")
             del model_data.loaded_sd_models[i]
             send_model_to_trash(loaded_model)
-            timer.record("send model to trash")
+            timer.record("send to trash")
 
     if already_loaded is not None:
         send_model_to_device(already_loaded)
-        timer.record("send model to device")
+        timer.record("send to device")
 
         model_data.set_sd_model(already_loaded, already_loaded=True)
 
@@ -816,11 +816,11 @@ def reuse_model_from_already_loaded(sd_model, checkpoint_info, timer):
             shared.opts.data["sd_model_checkpoint"] = already_loaded.sd_checkpoint_info.title
             shared.opts.data["sd_checkpoint_hash"] = already_loaded.sd_checkpoint_info.sha256
 
-        print(f"Using already loaded model {already_loaded.sd_checkpoint_info.title}: done in {timer.summary()}")
+        print(f"Using loaded model {util.yy(already_loaded.sd_checkpoint_info.name)}: done in {timer.summary()}")
         sd_vae.reload_vae_weights(already_loaded)
         return model_data.sd_model
     elif shared.opts.sd_checkpoints_limit > 1 and len(model_data.loaded_sd_models) < shared.opts.sd_checkpoints_limit:
-        print(f"Loading model {checkpoint_info.title} ({len(model_data.loaded_sd_models) + 1} out of {shared.opts.sd_checkpoints_limit})")
+        print(f"Loading model {checkpoint_info.name} ({len(model_data.loaded_sd_models) + 1} out of {shared.opts.sd_checkpoints_limit})")
 
         model_data.sd_model = None
         load_model(checkpoint_info)
@@ -833,7 +833,7 @@ def reuse_model_from_already_loaded(sd_model, checkpoint_info, timer):
         sd_vae.loaded_vae_file = getattr(sd_model, "loaded_vae_file", None)
         sd_vae.checkpoint_info = sd_model.sd_checkpoint_info
 
-        print(f"Reusing loaded model {sd_model.sd_checkpoint_info.title} to load {checkpoint_info.title}")
+        print(f"Reusing loaded model {sd_model.sd_checkpoint_info.name} to load {checkpoint_info.name}")
         return sd_model
     else:
         return None
