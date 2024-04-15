@@ -319,10 +319,11 @@ function extraNetworksEditUserMetadata(event, tabname, extraPage) {
 
     let editor = extraPageUserMetadataEditors[id]
     if (!editor) {
-        editor = {}
-        editor.page = _(id)
-        editor.nameTextarea = $("#" + id + "_name" + ' textarea')
-        editor.button = $("#" + id + "_button")
+        editor = {
+            page: _(id),
+            nameTextarea: $("#" + id + "_name textarea"),
+            button: $("#" + id + "_button")
+        }
         extraPageUserMetadataEditors[id] = editor
     }
     updateInput(editor.nameTextarea, event.target.parentElement.parentElement.dataset.name)

@@ -906,16 +906,9 @@ footer {
     gap: 0;
 }
 
-.extra-page-prompts{
-    margin-bottom: 0;
-}
-
-.extra-page-prompts.extra-page-prompts-active{
-    margin-bottom: 1em;
-}
-
 .extra-networks > div.tab-nav{
     border-style: dashed;
+    min-height: 39px;
 }
 
 .extra-networks-controls-div{
