@@ -317,7 +317,7 @@ def read_state_dict(checkpoint_file, print_global_state=False, map_location=None
 
 def get_checkpoint_state_dict(checkpoint_info: CheckpointInfo, timer):
     sd_model_hash = checkpoint_info.calculate_shorthash()
-    timer.record("calculate hash")
+    timer.record("calc hash")
 
     if checkpoint_info in checkpoints_loaded:
         # use checkpoint cache
@@ -364,7 +364,7 @@ def check_fp8(model):
 
 def load_model_weights(model, checkpoint_info: CheckpointInfo, state_dict, timer):
     sd_model_hash = checkpoint_info.calculate_shorthash()
-    timer.record("calculate hash")
+    timer.record("calc hash")
 
     if devices.fp8:
         # prevent model to load state dict in fp8
@@ -391,7 +391,7 @@ def load_model_weights(model, checkpoint_info: CheckpointInfo, state_dict, timer
         checkpoints_loaded[checkpoint_info] = state_dict.copy()
 
     model.load_state_dict(state_dict, strict=False)
-    timer.record("apply weights to model")
+    timer.record("apply weights")
 
     del state_dict
 
@@ -749,7 +749,7 @@ def load_model(checkpoint_info=None, already_loaded_state_dict=None):
     timer.record("load weights from state dict")
 
     send_model_to_device(sd_model)
-    timer.record("move model to device")
+    timer.record("move to device")
 
     sd_hijack.model_hijack.hijack(sd_model)
 
@@ -891,7 +891,7 @@ def reload_model_weights(sd_model=None, info=None, forced_reload=False):
 
         if not sd_model.lowvram:
             sd_model.to(devices.device)
-            timer.record("move model to device")
+            timer.record("move to device")
 
         script_callbacks.model_loaded_callback(sd_model)
         timer.record("script callbacks")

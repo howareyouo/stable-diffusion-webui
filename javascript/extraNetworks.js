@@ -296,10 +296,11 @@ function requestGet (url, data, handler, errorHandler) {
     xhr.send()
 }
 
-function extraNetworksRequestMetadata(event, page, item) {
+function extraNetworksRequestMetadata(event, page) {
     let showError = function () {
         extraNetworksShowMetadata('there was an error getting metadata')
     }
+    let item = event.target.parentElement.parentElement.dataset.name
     requestGet("./sd_extra_networks/metadata", {page, item}, function(data) {
         if (data && data.metadata) {
             extraNetworksShowMetadata(data.metadata)
@@ -313,7 +314,7 @@ function extraNetworksRequestMetadata(event, page, item) {
 
 let extraPageUserMetadataEditors = {}
 
-function extraNetworksEditUserMetadata(event, tabname, extraPage, cardName) {
+function extraNetworksEditUserMetadata(event, tabname, extraPage) {
     let id = tabname + '_' + extraPage + '_edit_user_metadata'
 
     let editor = extraPageUserMetadataEditors[id]
@@ -324,7 +325,7 @@ function extraNetworksEditUserMetadata(event, tabname, extraPage, cardName) {
         editor.button = $("#" + id + "_button")
         extraPageUserMetadataEditors[id] = editor
     }
-    updateInput(editor.nameTextarea, cardName)
+    updateInput(editor.nameTextarea, event.target.parentElement.parentElement.dataset.name)
     editor.button.click()
 
     popup(editor.page)
