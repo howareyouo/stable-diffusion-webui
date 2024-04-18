@@ -328,7 +328,7 @@ def get_checkpoint_state_dict(checkpoint_info: CheckpointInfo, timer):
 
     print(f"Loading weights [{sd_model_hash}] from {util.shortern(checkpoint_info.filename)}")
     res = read_state_dict(checkpoint_info.filename)
-    timer.record("load weights from disk")
+    timer.record("from disk")
 
     return res
 

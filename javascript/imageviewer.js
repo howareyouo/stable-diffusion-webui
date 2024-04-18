@@ -58,14 +58,12 @@ function modalImageSwitch(offset) {
     var galleryButtons = all_gallery_buttons();
 
     if (galleryButtons.length > 1) {
-        var currentButton = selected_gallery_button();
+        var currentButton = selected_gallery_button()
 
         var result = -1;
-        galleryButtons.forEach(function(v, i) {
-            if (v == currentButton) {
-                result = i;
-            }
-        });
+        galleryButtons.forEach((v, i) => {
+            if (v == currentButton) result = i
+        })
 
         if (result != -1) {
             var nextButton = galleryButtons[negmod((result + offset), galleryButtons.length)];
@@ -113,30 +111,28 @@ function modalPrevImage(event) {
 function modalKeyHandler(event) {
     switch (event.key) {
     case "s":
-        saveImage();
-        break;
+        saveImage()
+        break
     case "ArrowLeft":
-        modalPrevImage(event);
-        break;
+        modalPrevImage(event)
+        break
     case "ArrowRight":
-        modalNextImage(event);
-        break;
+        modalNextImage(event)
+        break
     case "Escape":
-        closeModal();
-        break;
+        closeModal()
+        break
     }
 }
 
 function setupImageForLightbox(e) {
     if (e.dataset.modded) {
-        return;
+        return
     }
-
     e.dataset.modded = true;
     e.style.cursor = 'pointer';
     e.style.userSelect = 'none';
-
-    e.addEventListener('mousedown', function(evt) {
+    e.on('mousedown', function(evt) {
         if (evt.button == 1) {
             open(evt.target.src);
             evt.preventDefault();
@@ -144,7 +140,7 @@ function setupImageForLightbox(e) {
         }
     }, true);
 
-    e.addEventListener('click', function(evt) {
+    e.on('click', function(evt) {
         if (!opts.js_modal_lightbox || evt.button != 0) return;
 
         modalZoomSet(_('modalImage'), opts.js_modal_lightbox_initially_zoomed)

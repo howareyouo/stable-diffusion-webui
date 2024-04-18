@@ -6,10 +6,10 @@ function isValidImageList(files) {
 
 function dropReplaceImage(imgWrap, files) {
     if (!isValidImageList(files)) {
-        return;
+        return
     }
 
-    const tmpFile = files[0];
+    const tmpFile = files[0]
 
     imgWrap.querySelector('.modify-upload button + button, .touch-none + div button + button')?.click();
     const callback = () => {
@@ -57,38 +57,34 @@ function eventHasFiles(e) {
 }
 
 function dragDropTargetIsPrompt(target) {
-    if (target?.placeholder && target?.placeholder.indexOf("Prompt") >= 0) return true;
-    if (target?.parentNode?.parentNode?.className?.indexOf("prompt") > 0) return true;
-    return false;
+    if (target?.placeholder?.includes("Prompt")) return true
+    if (target?.closest('.prompt')) return true
+    return false
 }
 
-window.document.on('dragover', e => {
+document.on('dragover', e => {
     const target = e.composedPath()[0];
     if (!eventHasFiles(e)) return;
 
     var targetImage = target.closest('[data-testid="image"]');
-    if (!dragDropTargetIsPrompt(target) && !targetImage) return;
+    if (!dragDropTargetIsPrompt(target) && !targetImage) return
 
-    e.stopPropagation();
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'copy';
+    e.stopPropagation()
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'copy'
 });
 
-window.document.on('drop', async e => {
+document.on('drop', async e => {
     const target = e.composedPath()[0];
-    const url = e.dataTransfer.getData('text/uri-list') || e.dataTransfer.getData('text/plain');
+    const url = e.dataTransfer.getData('text/uri-list') || e.dataTransfer.getData('text/plain')
     if (!eventHasFiles(e) && !url) return;
 
     if (dragDropTargetIsPrompt(target)) {
         e.stopPropagation();
         e.preventDefault();
 
-        const isImg2img = get_tab_index('tabs') == 1;
-        let prompt_image_target = isImg2img ? "img2img_prompt_image" : "txt2img_prompt_image";
-
-        const imgParent = _(prompt_image_target);
+        const fileInput = $('input[type="file"]', _(uiCurrentTab + "_prompt_image"));
         const files = e.dataTransfer.files;
-        const fileInput = imgParent.querySelector('input[type="file"]');
         if (eventHasFiles(e) && fileInput) {
             fileInput.files = files;
             fileInput.dispatchEvent(new Event('change'));
@@ -96,16 +92,16 @@ window.document.on('drop', async e => {
             try {
                 const request = await fetch(url);
                 if (!request.ok) {
-                    console.error('Error fetching URL:', url, request.status);
-                    return;
+                    console.error('Error fetching URL:', url, request.status)
+                    return
                 }
                 const data = new DataTransfer();
                 data.items.add(new File([await request.blob()], 'image.png'));
                 fileInput.files = data.files;
                 fileInput.dispatchEvent(new Event('change'));
             } catch (error) {
-                console.error('Error fetching URL:', url, error);
-                return;
+                console.error('Error fetching URL:', url, error)
+                return
             }
         }
     }
@@ -143,5 +139,5 @@ window.on('paste', e => {
             firstFreeImageField :
             visibleImageFields[visibleImageFields.length - 1]
         , files
-    );
-});
+    )
+})
