@@ -129,22 +129,18 @@ document.on("DOMContentLoaded", function() {
  */
 function uiElementIsVisible(el) {
     if (el === document) {
-        return true;
+        return true
     }
 
-    let computedStyle = getComputedStyle(el);
-    let isVisible = computedStyle.display !== 'none';
+    let isVisible = getComputedStyle(el).display !== 'none'
 
-    if (!isVisible) return false;
-    return uiElementIsVisible(el.parentNode);
+    if (!isVisible) return false
+    return uiElementIsVisible(el.parentNode)
 }
 
 function uiElementInSight(el) {
     let clRect = el.getBoundingClientRect();
-    let windowHeight = window.innerHeight;
-    let isOnScreen = clRect.bottom > 0 && clRect.top < windowHeight;
-
-    return isOnScreen;
+    return clRect.bottom > 0 && clRect.top < window.innerHeight;
 }
 
 function elementIndex(element) {

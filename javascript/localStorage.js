@@ -1,26 +1,14 @@
 
 function localSet(k, v) {
-    try {
-        localStorage.setItem(k, v);
-    } catch (e) {
-        console.warn(`Failed to save ${k} to localStorage: ${e}`);
-    }
+    localStorage.setItem(k, v)
 }
 
-function localGet(k, def) {
-    try {
-        return localStorage.getItem(k);
-    } catch (e) {
-        console.warn(`Failed to load ${k} from localStorage: ${e}`);
-    }
-
-    return def;
+function localGet(k, def = '') {
+    let v = localStorage.getItem(k)
+    if (v === null) v = def
+    return v
 }
 
 function localRemove(k) {
-    try {
-        return localStorage.removeItem(k);
-    } catch (e) {
-        console.warn(`Failed to remove ${k} from localStorage: ${e}`);
-    }
+    return localStorage.removeItem(k)
 }

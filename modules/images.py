@@ -673,7 +673,7 @@ def save_image(image, path, basename, seed=None, prompt=None, extension='png', i
         else:
             file_decoration = opts.samples_filename_pattern or "[seed]-[prompt_spaces]"
 
-        if not p.enable_hr:
+        if not hasattr(p, "enable_hr") or not p.enable_hr:
             file_decoration = file_decoration.replace('.[upscaler]', '')
 
         file_decoration = namegen.apply(file_decoration) + suffix

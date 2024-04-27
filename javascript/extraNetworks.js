@@ -2,8 +2,8 @@ const trim = s => s.replace(/^ +| +$/g, '')
 
 function setupExtraNetworksForTab(tabname) {
     let tabnav = $(`#${tabname}_extra_tabs > .tab-nav`)
-    
-    function formatPrompt (textarea) {
+
+    function formatPrompt(textarea) {
         let text = textarea.value.trim()
         let endComma = text.endsWith(',')
         text = text
@@ -29,7 +29,7 @@ function setupExtraNetworksForTab(tabname) {
         if (!activePromptTextarea[tabname]) {
             activePromptTextarea[tabname] = textarea
         }
-        textarea.on('focus', function() {
+        textarea.on('focus', function () {
             activePromptTextarea[tabname] = textarea
         })
         textarea.on('blur', () => {
@@ -40,7 +40,7 @@ function setupExtraNetworksForTab(tabname) {
         })
     }
 
-    $$(`#${tabname}_extra_tabs .extra-page`).forEach(function(page) {
+    $$(`#${tabname}_extra_tabs .extra-page`).forEach(function (page) {
         let search = $(`#${page.id}_search`)
         let sort_mod = $(`#${page.id}_sort`)
         let sort_dir = $(`#${page.id}_sort_dir`)
@@ -61,12 +61,12 @@ function setupExtraNetworksForTab(tabname) {
             sort == 1 && applySort()
         }
 
-        let applySort = function() {
+        let applySort = function () {
             let reverse = sort_dir.dataset.sortdir == 'Descending'
             let sortKey = "sort" + sort_mod.value
             let parent = $('.extra-network-cards', page)
             let sorted = Array.from(parent.children)
-            sorted.sort(function(cardA, cardB) {
+            sorted.sort(function (cardA, cardB) {
                 let a = cardA.dataset[sortKey]
                 let b = cardB.dataset[sortKey]
                 let res = isNaN(a) || isNaN(b) ? a.localeCompare(b) : a - b
@@ -79,9 +79,9 @@ function setupExtraNetworksForTab(tabname) {
             localSet(sort_dir.id, sort_dir.dataset.sortdir)
         }
 
-        search.value = localGet(search.id)
-        sort_mod.value = localGet(sort_mod.id)
-        sort_dir.dataset.sortdir = localGet(sort_dir.id)
+        search.value = localGet(search.id, '')
+        sort_mod.value = localGet(sort_mod.id, 'Default')
+        sort_dir.dataset.sortdir = localGet(sort_dir.id, 'Ascending')
 
         search.on("input", debounce(applyFilter, 500))
         extraNetworksApplyFilter[page.id] = applyFilter
@@ -125,7 +125,7 @@ function extraNetworksMovePromptToTab(tabname, id, showPrompt, showNegativePromp
 
 
 function extraNetworksShowControlsForPage(tabname, tabname_full) {
-    $$(`#${tabname}_extra_tabs > .tab-nav .extra-network-control`).forEach(function(el) {
+    $$(`#${tabname}_extra_tabs > .tab-nav .extra-network-control`).forEach(function (el) {
         el.hidden = el.role != tabname_full
     })
 }
@@ -172,7 +172,7 @@ function tryToRemoveExtraNetworkFromPrompt(textarea, text, isNeg) {
         let extraTextAfterNet = m[2]
         let partToSearch = m[1]
         let foundPos = -1
-        newValue = textarea.value.replaceAll(isNeg ? re_extranet_g_neg : re_extranet_g, function(found, net, pos) {
+        newValue = textarea.value.replaceAll(isNeg ? re_extranet_g_neg : re_extranet_g, function (found, net, pos) {
             m = found.match(isNeg ? re_extranet_neg : re_extranet)
             if (m[1] == partToSearch) {
                 replaced = true
@@ -209,7 +209,7 @@ function updatePromptArea(text, textarea, isNeg) {
         if (!val.endsWith(add)) {
             val += add
         }
-        val +=  ' ' + text
+        val += ' ' + text
         textarea.value = val
     }
     updateInput(textarea)
@@ -245,16 +245,16 @@ function extraNetworksControlSortDirClick(event, tabname, extra_networks_tabname
 
 let globalPopup, globalPopupBody
 
-function closePopup () {
+function closePopup() {
     if (!globalPopup) return
     globalPopup.style.display = 'none'
 }
 
-function popup (elem) {
+function popup(elem) {
     if (!globalPopup) {
-        globalPopup = createElement('div', 'global-popup', {onclick: closePopup}, $('.main'))
+        globalPopup = createElement('div', 'global-popup', { onclick: closePopup }, $('.main'))
 
-        createElement('div', 'global-popup-close', {onclick: closePopup, title: 'Close'}, globalPopup)
+        createElement('div', 'global-popup-close', { onclick: closePopup, title: 'Close' }, globalPopup)
 
         globalPopupBody = createElement('div', 'global-popup-inner', {
             onclick: e => e.stopPropagation()
@@ -337,11 +337,10 @@ function extraNetworksShowMetadata(text) {
         console.error(error);
     }
 
-function extraNetworksShowMetadata (textContent) {
-    popup(createElement('pre', 'popup-metadata', {textContent}))
+    popup(createEl('pre', 'popup-metadata', { textContent: text }))
 }
 
-function requestGet (url, data, handler, errorHandler) {
+function requestGet(url, data, handler, errorHandler) {
     let xhr = new XMLHttpRequest()
     xhr.open('GET', url + '?' + new URLSearchParams(data), true)
     xhr.onreadystatechange = function () {
@@ -365,7 +364,7 @@ function extraNetworksRequestMetadata(event, page) {
         extraNetworksShowMetadata('there was an error getting metadata')
     }
     let item = event.target.parentElement.parentElement.dataset.name
-    requestGet("./sd_extra_networks/metadata", {page, item}, function(data) {
+    requestGet("./sd_extra_networks/metadata", { page, item }, function (data) {
         if (data && data.metadata) {
             extraNetworksShowMetadata(data.metadata)
         } else {
@@ -398,7 +397,7 @@ function extraNetworksEditUserMetadata(event, tabname, extraPage) {
 }
 
 function extraNetworksRefreshSingleCard(page, tabname, name) {
-    requestGet("./sd_extra_networks/get-single-card", {page, tabname, name}, function(data) {
+    requestGet("./sd_extra_networks/get-single-card", { page, tabname, name }, function (data) {
         if (data?.html) {
             let card = $(`#${tabname}_${page.replace(' ', '_')}_html .card[data-name="${name}"]`)
             card.replaceWith(createElementFromHtml(data.html))
