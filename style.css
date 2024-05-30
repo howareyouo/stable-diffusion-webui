@@ -15,7 +15,7 @@ div.gradio-image button[aria-label="Edit"] {
     --button-secondary-text-color: var(--neutral-400);
     --body-text-color: var(--neutral-300);
     --tool-button-size: 2.5rem;
-    --font: 'Noto Sans';
+    --font: Amazon Ember, Noto Sans;
 }
 
 * {outline: none}

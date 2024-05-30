@@ -173,15 +173,13 @@ function onProgress(percent, progressText, previewImg) {
     modalProgressBar.style.width = percent + '%'
     modalProgressBar.innerText = progressText
     if (percent == 100 && progressText == doneText) {
-        let images = $$('.gradio-gallery img');
+        let images = $$('.gradio-gallery img')
         if (images.length) {
             images.forEach(setupImageForLightbox)
             modalImage.src = images[0].src
             // updateOnBackgroundChange()
         }
-        setTimeout(() => {
-            modalProgress.hidden = 1
-        }, 777)
+        setTimeout(() => modalProgress.hidden = 1, 777)
     } else if (previewImg) {
         modalImage.src = previewImg
     }    

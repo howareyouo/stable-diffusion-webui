@@ -225,7 +225,7 @@ def select_checkpoint():
 
     checkpoint_info = next(iter(checkpoints_list.values()))
     if model_checkpoint is not None:
-        print(f"Checkpoint {model_checkpoint} not found; loading fallback {checkpoint_info.title}", file=sys.stderr)
+        print(f"Checkpoint {util.r(model_checkpoint)} not found; loading fallback {util.y(checkpoint_info.name)}", file=sys.stderr)
 
     return checkpoint_info
 
@@ -772,7 +772,7 @@ def load_model(checkpoint_info=None, already_loaded_state_dict=None):
 
     timer.record("calc empty prompt")
 
-    print(f"Model loaded in {timer.summary()}.")
+    print(f"Loaded in {timer.summary()}.")
 
     return sd_model
 
@@ -791,7 +791,7 @@ def reuse_model_from_already_loaded(sd_model, checkpoint_info, timer):
 
     if shared.opts.sd_checkpoints_keep_in_cpu:
         send_model_to_cpu(sd_model)
-        timer.record("send to cpu")
+        timer.record("to cpu")
 
     already_loaded = None
     for i in reversed(range(len(model_data.loaded_sd_models))):
@@ -804,11 +804,11 @@ def reuse_model_from_already_loaded(sd_model, checkpoint_info, timer):
             print(f"Unloading model {len(model_data.loaded_sd_models)} over the limit of {shared.opts.sd_checkpoints_limit}: {loaded_model.sd_checkpoint_info.name}")
             del model_data.loaded_sd_models[i]
             send_model_to_trash(loaded_model)
-            timer.record("send to trash")
+            timer.record("to trash")
 
     if already_loaded is not None:
         send_model_to_device(already_loaded)
-        timer.record("send to device")
+        timer.record("to device")
 
         model_data.set_sd_model(already_loaded, already_loaded=True)
 

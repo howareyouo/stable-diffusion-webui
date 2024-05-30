@@ -266,7 +266,6 @@ on('keydown', e => {
             }
             break
         case 'Backquote':
-            el.tagName == 'INPUT'
         case 'ShiftRight':
             imgtab && doGenerate(e)
             break
