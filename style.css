@@ -55,7 +55,7 @@ div.gradio-group, div.styler{
 }
 
 div.compact{
-    gap: 1em;
+    gap: 1em
 }
 
 .gradio-dropdown label span:not(.has-info),
@@ -435,7 +435,7 @@ div.toprow-compact-tools{
     flex: 0 1 fit-content;
 }
 #quicksettings > div.gradio-dropdown{
-    min-width: 25em !important
+    min-width: 20em !important
 }
 #quicksettings > #setting_sd_model_checkpoint {
     min-width: 35em !important
@@ -981,7 +981,7 @@ footer {
     background-size: cover;
     border-radius: .2rem;
     aspect-ratio: 2/3;
-    height: 22rem;
+    height: 20.5rem;
     position: relative;
     overflow: hidden;
     cursor: pointer;
@@ -1119,7 +1119,7 @@ div.accordions > div.input-accordion.input-accordion-open{
 .extra-network-html {
     display: flex;
     flex-direction: column;
-    max-height: calc(100vh - 25rem);
+    max-height: calc(100vh - 27.5rem);
     overflow: hidden;
 }
 
@@ -1173,8 +1173,7 @@ div.accordions > div.input-accordion.input-accordion-open{
     line-height: 1;
 }
 
-
-.extra-network-control .extra-network-control--search .extra-network-control--search-text::placeholder {
+.extra-network-control--search-text::placeholder {
     color: var(--input-placeholder-color);
 }
 
@@ -1241,7 +1240,7 @@ option {
     background-color: rgba(255, 255, 255, .15);
 }
 
-.extra-network-control .extra-network-control--enabled .extra-network-control--icon{
+.extra-network-control .extra-network-control--enabled .extra-network-control--icon {
     background-color: var(--button-secondary-text-color);
 }
 

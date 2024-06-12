@@ -182,10 +182,10 @@ function createElementFromHtml(html) {
   }
 
 function doGenerate(e) {
-    get_uiCurrentTabContent().one('button[id$=_generate]')?.click()
+    _(uiCurrentTab + '_generate')?.click()
     if (e) {
         e.stopPropagation()
-        e.preventDefault()
+        e.cancelable && e.preventDefault()
     }
 }
 
@@ -286,3 +286,10 @@ on("auxclick", e => {
             toggleModal()
     }
 }, true)
+
+on('wheel', e => {
+    if (e.target.id == 'modalImage') {
+        toggleSeed(e.deltaY < 0)
+        doGenerate(e)
+    }
+}, {passive: false})

@@ -176,7 +176,7 @@ function editAttention(e) {
         wordStart++
         wordEnd++
     }
-    
+
     el.setRangeText(replacement, start, end)
     el.setSelectionRange(wordStart, wordEnd)
     updateInput(el)

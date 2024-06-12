@@ -8,9 +8,9 @@ function setupExtraNetworksForTab(tabname) {
         let endComma = text.endsWith(',')
         text = text
             .replaceAll(/ {2,}/g, ' ')
-            .replaceAll(/\s*:\s*/g, ':')
-            .replaceAll(/([(<])[, ]*/g, '$1')
-            .replaceAll(/[, ]*([>)])/g, '$1')
+            .replaceAll(/[, ]*:\s*/g, ':')
+            .replaceAll(/([(<])[, ]+/g, '$1')
+            .replaceAll(/[, ]+([>)])/g, '$1')
             .split('\n')
             .map(s => s
                 .split(',')

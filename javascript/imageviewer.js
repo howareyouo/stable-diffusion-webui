@@ -129,22 +129,16 @@ function setupImageForLightbox(e) {
     if (e.dataset.modded) {
         return
     }
-    e.dataset.modded = true;
-    e.style.cursor = 'pointer';
-    e.style.userSelect = 'none';
+    e.dataset.modded = true
     e.on('mousedown', function(evt) {
         if (evt.button == 1) {
-            open(evt.target.src);
-            evt.preventDefault();
-            return;
+            open(evt.target.src)
         }
-    }, true);
+    }, true)
 
     e.on('click', function(evt) {
-        if (!opts.js_modal_lightbox || evt.button != 0) return;
-
+        if (!opts.js_modal_lightbox || evt.button != 0) return
         modalZoomSet(_('modalImage'), opts.js_modal_lightbox_initially_zoomed)
-        evt.preventDefault()
         showModal(evt)
     }, true)
 }

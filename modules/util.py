@@ -16,16 +16,16 @@ def listfiles(dirname):
     return [file for file in filenames if os.path.isfile(file)]
 
 def r(text):
-    return Style.DIM + Fore.RED + text + + Fore.RESET
+    return Style.DIM + Fore.RED + text + Fore.RESET
 
 def rr(text):
-    return Fore.RED + text + + Fore.RESET
+    return Fore.RED + text + Fore.RESET
 
 def rrr(text):
-    return Fore.LIGHTRED_EX + text + + Fore.RESET
+    return Fore.LIGHTRED_EX + text + Fore.RESET
 
 def g(text):
-    return Style.DIM + Fore.GREEN + text + + Fore.RESET
+    return Style.DIM + Fore.GREEN + text + Fore.RESET
 
 def gg(text):
     return Fore.GREEN + text + Fore.RESET
