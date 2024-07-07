@@ -99,6 +99,7 @@ function requestProgress(id_task, progressContainer, gallery, atEnd, onProgress,
 
     let tick = opts.live_preview_refresh_period || 999, i = 0
     let func = function (id_task, id_live_preview) {
+        requestWakeLock();
         request('./internal/progress', {id_task, id_live_preview}, function (res) {
             if (res.completed) {
                 bar.style.width = '100%'
@@ -109,7 +110,7 @@ function requestProgress(id_task, progressContainer, gallery, atEnd, onProgress,
             }
             let progressText = ''
             let percent = res.progress * 100
-            
+
             if (res.progress > 0) {
                 progressText = percent.toFixed(0) + '%'
             }
@@ -144,12 +145,12 @@ function requestProgress(id_task, progressContainer, gallery, atEnd, onProgress,
             }
 
             setTimeout(func, tick, id_task, res.id_live_preview)
-            
+
             if (++i >= 3 || res.queued)
                 tick = Math.min(3333, elapsedTime / i * 2222)
             else
                 tick = Math.max(333, tick * (1 - res.progress))
-            
+
         }, removeProgressBar)
     }
 

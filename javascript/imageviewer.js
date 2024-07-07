@@ -16,6 +16,8 @@ function showModal(evt, src) {
         src = (evt.target || evt.srcElement).src
     }
     const modalImage = _("modalImage");
+    const modalToggleLivePreviewBtn = gradioApp().getElementById("modal_toggle_live_preview");
+    modalToggleLivePreviewBtn.innerHTML = opts.js_live_preview_in_modal_lightbox ? "&#x1F5C7;" : "&#x1F5C6;";
     const lb = _("lightbox");
     modalImage.src = src
     modalZoomSet(modalImage, opts.js_modal_lightbox_initially_zoomed)
@@ -58,20 +60,15 @@ function modalImageSwitch(offset) {
     var galleryButtons = all_gallery_buttons();
 
     if (galleryButtons.length > 1) {
-        var currentButton = selected_gallery_button()
-
-        var result = -1;
-        galleryButtons.forEach((v, i) => {
-            if (v == currentButton) result = i
-        })
+        var result = selected_gallery_index();
 
         if (result != -1) {
             var nextButton = galleryButtons[negmod((result + offset), galleryButtons.length)];
             nextButton.click();
-            const modalImage = _("modalImage");
-            const modal = _("lightbox");
+            const modalImage = gradioApp().getElementById("modalImage");
+            const modal = gradioApp().getElementById("lightboxModal");
             modalImage.src = nextButton.children[0].src;
-            if (modalImage.hidden) {
+            if (modalImage.style.display === 'none') {
                 modal.style.setProperty('background-image', `url(${modalImage.src})`);
             }
             setTimeout(function() {
@@ -153,6 +150,13 @@ function modalZoomToggle(event) {
     event.stopPropagation();
 }
 
+function modalLivePreviewToggle(event) {
+    const modalToggleLivePreview = gradioApp().getElementById("modal_toggle_live_preview");
+    opts.js_live_preview_in_modal_lightbox = !opts.js_live_preview_in_modal_lightbox;
+    modalToggleLivePreview.innerHTML = opts.js_live_preview_in_modal_lightbox ? "&#x1F5C7;" : "&#x1F5C6;";
+    event.stopPropagation();
+}
+
 function modalTileImageToggle(event) {
     const modalImage = _("modalImage");
     const modal = _("lightbox");
@@ -176,7 +180,7 @@ function onProgress(percent, progressText, previewImg) {
         setTimeout(() => modalProgress.hidden = 1, 777)
     } else if (previewImg) {
         modalImage.src = previewImg
-    }    
+    }
 }
 
 let modalProgress, modalProgressBar
@@ -197,6 +201,14 @@ document.addEventListener("DOMContentLoaded", function() {
     createElement('a', 'modalNext', {innerHTML: '▶', tabIndex: 0}, modal)
         .on('click', modalNextImage, true);
     */
+
+    const modalToggleLivePreview = document.createElement('span');
+    modalToggleLivePreview.className = 'modalToggleLivePreview cursor';
+    modalToggleLivePreview.id = "modal_toggle_live_preview";
+    modalToggleLivePreview.innerHTML = "&#x1F5C6;";
+    modalToggleLivePreview.onclick = modalLivePreviewToggle;
+    modalToggleLivePreview.title = "Toggle live preview";
+    modalControls.appendChild(modalToggleLivePreview);
     createElement('img', '', {id: 'modalImage'}, modal)
 
     modalProgress = createElement('div', 'modal-progress', modal)

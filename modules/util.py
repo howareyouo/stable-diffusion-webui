@@ -187,7 +187,7 @@ class MassFileLister:
 
 def topological_sort(dependencies):
     """Accepts a dictionary mapping name to its dependencies, returns a list of names ordered according to dependencies.
-    Ignores errors relating to missing dependeencies or circular dependencies
+    Ignores errors relating to missing dependencies or circular dependencies
     """
 
     visited = {}
@@ -239,6 +239,6 @@ Requested path was: {path}
     elif platform.system() == "Darwin":
         subprocess.Popen(["open", path])
     elif "microsoft-standard-WSL2" in platform.uname().release:
-        subprocess.Popen(["wsl-open", path])
+        subprocess.Popen(["explorer.exe", subprocess.check_output(["wslpath", "-w", path])])
     else:
         subprocess.Popen(["xdg-open", path])
