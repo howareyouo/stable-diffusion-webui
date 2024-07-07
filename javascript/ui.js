@@ -10,7 +10,7 @@ function set_theme(theme) {
 function all_gallery_buttons() {
     var allGalleryButtons = $$('#tabs .tabitem[style$="block;"] .gradio-gallery .thumbnails .thumbnail-small')
     var visibleGalleryButtons = [];
-    allGalleryButtons.forEach(function(elem) {
+    allGalleryButtons.forEach(function (elem) {
         if (elem.parentElement.offsetParent) {
             visibleGalleryButtons.push(elem);
         }
@@ -143,7 +143,7 @@ function submit() {
     var id = randomId();
     localSet("txt2img_task_id", id);
 
-    requestProgress(id, _('txt2img_gallery_container'), _('txt2img_gallery'), function() {
+    requestProgress(id, _('txt2img_gallery_container'), _('txt2img_gallery'), function () {
         showSubmitButtons('txt2img', true);
         localRemove("txt2img_task_id");
         showRestoreProgressButton('txt2img', false);
@@ -170,7 +170,7 @@ function submit_img2img() {
     var id = randomId();
     localSet("img2img_task_id", id);
 
-    requestProgress(id, _('img2img_gallery_container'), _('img2img_gallery'), function() {
+    requestProgress(id, _('img2img_gallery_container'), _('img2img_gallery'), function () {
         showSubmitButtons('img2img', true);
         localRemove("img2img_task_id");
         showRestoreProgressButton('img2img', false);
@@ -189,7 +189,7 @@ function submit_extras() {
 
     var id = randomId();
 
-    requestProgress(id, _('extras_gallery_container'), _('extras_gallery'), function() {
+    requestProgress(id, _('extras_gallery_container'), _('extras_gallery'), function () {
         showSubmitButtons('extras', true);
     });
 
@@ -207,7 +207,7 @@ function restoreProgressTxt2img() {
 
     if (id) {
         showSubmitInterruptingPlaceholder('txt2img');
-        requestProgress(id, _('txt2img_gallery_container'), _('txt2img_gallery'), function() {
+        requestProgress(id, _('txt2img_gallery_container'), _('txt2img_gallery'), function () {
             showSubmitButtons('txt2img', true);
         }, null, 0);
     }
@@ -222,7 +222,7 @@ function restoreProgressImg2img() {
 
     if (id) {
         showSubmitInterruptingPlaceholder('img2img');
-        requestProgress(id, _('img2img_gallery_container'), _('img2img_gallery'), function() {
+        requestProgress(id, _('img2img_gallery_container'), _('img2img_gallery'), function () {
             showSubmitButtons('img2img', true);
         }, null, 0);
     }
@@ -239,7 +239,7 @@ function setupResolutionPasting(tabname) {
     var width = $(`#${tabname}_width input[type=number]`);
     var height = $(`#${tabname}_height input[type=number]`);
     for (const el of [width, height]) {
-        el.on('paste', function(event) {
+        el.on('paste', function (event) {
             var pasteData = event.clipboardData.getData('text/plain');
             var parsed = pasteData.match(/^\s*(\d+)\D+(\d+)\s*$/);
             if (parsed) {
@@ -251,7 +251,7 @@ function setupResolutionPasting(tabname) {
     }
 }
 
-onUiLoaded(function() {
+onUiLoaded(function () {
     showRestoreProgressButton('txt2img', localGet("txt2img_task_id"));
     showRestoreProgressButton('img2img', localGet("img2img_task_id"));
     setupResolutionPasting('txt2img');
@@ -261,7 +261,7 @@ onUiLoaded(function() {
 
 function modelmerger() {
     var id = randomId();
-    requestProgress(id, _('modelmerger_results_panel'), null, function() {});
+    requestProgress(id, _('modelmerger_results_panel'), null, function () { });
 
     var res = create_submit_args(arguments);
     res[0] = id;
@@ -280,7 +280,7 @@ function confirm_clear_prompt(prompt, negative_prompt) {
 
 
 var opts = {};
-onAfterUiUpdate(function() {
+onAfterUiUpdate(function () {
     if (Object.keys(opts).length != 0) return;
 
     var json_elem = _('settings_json');
@@ -293,7 +293,7 @@ onAfterUiUpdate(function() {
     executeCallbacks(optionsChangedCallbacks); /*global optionsChangedCallbacks*/
 
     Object.defineProperty(textarea, 'value', {
-        set: function(newValue) {
+        set: function (newValue) {
             var valueProp = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value');
             var oldValue = valueProp.get.call(textarea);
             valueProp.set.call(textarea, newValue);
@@ -304,7 +304,7 @@ onAfterUiUpdate(function() {
 
             executeCallbacks(optionsChangedCallbacks);
         },
-        get: function() {
+        get: function () {
             var valueProp = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value');
             return valueProp.get.call(textarea);
         }
@@ -313,7 +313,7 @@ onAfterUiUpdate(function() {
     json_elem.parentElement.style.display = "none";
 });
 
-onOptionsChanged(function() {
+onOptionsChanged(function () {
     var elem = _('sd_checkpoint_hash');
     var sd_checkpoint_hash = opts.sd_checkpoint_hash || "";
     var shorthash = sd_checkpoint_hash.substring(0, 10);
@@ -330,7 +330,7 @@ let txt2img_textarea, img2img_textarea = undefined;
 function restart_reload() {
     document.body.innerHTML = '<div style="padding-top:25%;color:#ccc;background:#222;text-align:center;flex:1"><h1>Reloading...</h1></div>'
 
-    var requestPing = function() {
+    var requestPing = function () {
         requestGet("./internal/ping", {}, () => location.reload(), () => setTimeout(requestPing, 500));
     };
 
@@ -341,11 +341,11 @@ function restart_reload() {
 
 // Simulate an `input` DOM event for Gradio Textbox component. Needed after you edit its contents in javascript, otherwise your edits
 // will only visible on web page and not sent to python.
-function updateInput (el, val) {
+function updateInput(el, val) {
     if (typeof el == "string") el = $(el)
     if (val != undefined) el.value = val
-    let evt = new Event('input', {bubbles: true})
-    Object.defineProperty(evt, 'target', {value: el})
+    let evt = new Event('input', { bubbles: true })
+    Object.defineProperty(evt, 'target', { value: el })
     el.dispatchEvent(evt)
 }
 
@@ -365,7 +365,7 @@ function updateImg2imgResizeToTextAfterChangingImage() {
     // At the time this is called from gradio, the image has no yet been replaced.
     // There may be a better solution, but this is simple and straightforward so I'm going with it.
 
-    setTimeout(function() {
+    setTimeout(function () {
         _('img2img_update_resize_to').click()
     }, 500)
 
@@ -377,8 +377,7 @@ function setRandomSeed(elem_id) {
     var input = $("#" + elem_id + " input");
     if (!input) return [];
 
-    input.value = "-1";
-    updateInput(input);
+    updateInput(input, "-1");
     return [];
 }
 
@@ -388,11 +387,9 @@ function switchWidthHeight(tabname) {
     if (!width || !height) return [];
 
     var tmp = width.value;
-    width.value = height.value;
-    height.value = tmp;
 
-    updateInput(width);
-    updateInput(height);
+    updateInput(width, height.value);
+    updateInput(height, tmp);
     return [];
 }
 
@@ -401,7 +398,7 @@ var onEditTimers = {};
 
 // calls func after afterMs milliseconds has passed since the input elem has been edited by user
 function onEdit(editId, elem, afterMs, func) {
-    var edited = function() {
+    var edited = function () {
         var existingTimer = onEditTimers[editId];
         if (existingTimer) clearTimeout(existingTimer);
 

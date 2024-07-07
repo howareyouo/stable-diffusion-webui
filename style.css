@@ -1119,7 +1119,7 @@ div.accordions > div.input-accordion.input-accordion-open{
 .extra-network-html {
     display: flex;
     flex-direction: column;
-    max-height: calc(100vh - 27.5rem);
+    max-height: calc(100vh - 26.5rem);
     overflow: hidden;
 }
 

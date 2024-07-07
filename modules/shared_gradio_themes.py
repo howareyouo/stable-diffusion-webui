@@ -13,8 +13,8 @@ gradio_hf_hub_themes = [
     "abidlabs/Lime",
     "victorrauwcc/RCC",
     "Ama434/neutral-barlow",
-    "reilnuud/polite",
     "aliabid94/new-theme",
+    "reilnuud/polite",
 ]
 
 
