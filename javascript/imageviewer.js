@@ -16,8 +16,6 @@ function showModal(evt, src) {
         src = (evt.target || evt.srcElement).src
     }
     const modalImage = _("modalImage");
-    const modalToggleLivePreviewBtn = gradioApp().getElementById("modal_toggle_live_preview");
-    modalToggleLivePreviewBtn.innerHTML = opts.js_live_preview_in_modal_lightbox ? "&#x1F5C7;" : "&#x1F5C6;";
     const lb = _("lightbox");
     modalImage.src = src
     modalZoomSet(modalImage, opts.js_modal_lightbox_initially_zoomed)
@@ -43,10 +41,10 @@ function updateOnBackgroundChange() {
     if (modalImage && modalImage.offsetParent) {
         let currentButton = selected_gallery_button();
         let preview = $$('.livePreview > img');
-        if (opts.js_live_preview_in_modal_lightbox && preview.length > 0) {
+        if (preview.length) {
             // show preview image if available
             modalImage.src = preview[preview.length - 1].src;
-        } else if (currentButton?.children?.length > 0 && modalImage.src != currentButton.children[0].src) {
+        } else if (currentButton?.children?.length && modalImage.src != currentButton.children[0].src) {
             modalImage.src = currentButton.children[0].src;
             if (modalImage.hidden) {
                 const modal = _("lightbox");
@@ -150,13 +148,6 @@ function modalZoomToggle(event) {
     event.stopPropagation();
 }
 
-function modalLivePreviewToggle(event) {
-    const modalToggleLivePreview = gradioApp().getElementById("modal_toggle_live_preview");
-    opts.js_live_preview_in_modal_lightbox = !opts.js_live_preview_in_modal_lightbox;
-    modalToggleLivePreview.innerHTML = opts.js_live_preview_in_modal_lightbox ? "&#x1F5C7;" : "&#x1F5C6;";
-    event.stopPropagation();
-}
-
 function modalTileImageToggle(event) {
     const modalImage = _("modalImage");
     const modal = _("lightbox");
@@ -199,16 +190,9 @@ document.addEventListener("DOMContentLoaded", function() {
     createElement('a', 'modalPrev', {innerHTML: '◀', tabIndex: 0}, modal)
         .on('click', modalPrevImage, true)
     createElement('a', 'modalNext', {innerHTML: '▶', tabIndex: 0}, modal)
-        .on('click', modalNextImage, true);
+        .on('click', modalNextImage, true);    
     */
 
-    const modalToggleLivePreview = document.createElement('span');
-    modalToggleLivePreview.className = 'modalToggleLivePreview cursor';
-    modalToggleLivePreview.id = "modal_toggle_live_preview";
-    modalToggleLivePreview.innerHTML = "&#x1F5C6;";
-    modalToggleLivePreview.onclick = modalLivePreviewToggle;
-    modalToggleLivePreview.title = "Toggle live preview";
-    modalControls.appendChild(modalToggleLivePreview);
     createElement('img', '', {id: 'modalImage'}, modal)
 
     modalProgress = createElement('div', 'modal-progress', modal)

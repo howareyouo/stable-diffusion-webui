@@ -17,6 +17,7 @@ from modules.timer import Timer
 from modules.shared import opts
 import tomesd
 import numpy as np
+from modules.util import st, y, yy
 
 model_dir = "Stable-diffusion"
 model_path = os.path.abspath(os.path.join(paths.models_path, model_dir))
@@ -331,7 +332,7 @@ def read_state_dict(checkpoint_file, print_global_state=False, map_location=None
 
 def get_checkpoint_state_dict(checkpoint_info: CheckpointInfo, timer):
     sd_model_hash = checkpoint_info.calculate_shorthash()
-    timer.record("calculate hash")
+    timer.record("calc hash")
 
     if checkpoint_info in checkpoints_loaded:
         # use checkpoint cache
@@ -340,9 +341,9 @@ def get_checkpoint_state_dict(checkpoint_info: CheckpointInfo, timer):
         checkpoints_loaded.move_to_end(checkpoint_info)
         return checkpoints_loaded[checkpoint_info]
 
-    print(f"Loading weights [{sd_model_hash}] from {checkpoint_info.filename}")
+    print(f"Loading weights from {st(checkpoint_info.filename)}")
     res = read_state_dict(checkpoint_info.filename)
-    timer.record("load weights from disk")
+    timer.record("load weights")
 
     return res
 
@@ -409,7 +410,7 @@ def set_model_fields(model):
 
 def load_model_weights(model, checkpoint_info: CheckpointInfo, state_dict, timer):
     sd_model_hash = checkpoint_info.calculate_shorthash()
-    timer.record("calculate hash")
+    timer.record("calc hash")
 
     if devices.fp8:
         # prevent model to load state dict in fp8
@@ -438,7 +439,7 @@ def load_model_weights(model, checkpoint_info: CheckpointInfo, state_dict, timer
         model.before_load_weights(state_dict)
 
     model.load_state_dict(state_dict, strict=False)
-    timer.record("apply weights to model")
+    timer.record("apply weights")
 
     if hasattr(model, "after_load_weights"):
         model.after_load_weights(state_dict)
@@ -844,10 +845,10 @@ def load_model(checkpoint_info=None, already_loaded_state_dict=None):
     with sd_disable_initialization.LoadStateDictOnMeta(state_dict, device=model_target_device(sd_model), weight_dtype_conversion=weight_dtype_conversion):
         load_model_weights(sd_model, checkpoint_info, state_dict, timer)
 
-    timer.record("load weights from state dict")
+    timer.record("load weights")
 
     send_model_to_device(sd_model)
-    timer.record("move model to device")
+    timer.record("move to device")
 
     sd_hijack.model_hijack.hijack(sd_model)
 
@@ -859,7 +860,7 @@ def load_model(checkpoint_info=None, already_loaded_state_dict=None):
 
     sd_hijack.model_hijack.embedding_db.load_textual_inversion_embeddings(force_reload=True)  # Reload embeddings after model load as they may or may not fit the model
 
-    timer.record("load textual inversion embeddings")
+    timer.record("load embeddings")
 
     script_callbacks.model_loaded_callback(sd_model)
 
@@ -868,7 +869,7 @@ def load_model(checkpoint_info=None, already_loaded_state_dict=None):
     with devices.autocast(), torch.no_grad():
         sd_model.cond_stage_model_empty_prompt = get_empty_cond(sd_model)
 
-    timer.record("calculate empty prompt")
+    timer.record("calc empty prompt")
 
     print(f"Model loaded in {timer.summary()}.")
 
@@ -889,7 +890,7 @@ def reuse_model_from_already_loaded(sd_model, checkpoint_info, timer):
 
     if shared.opts.sd_checkpoints_keep_in_cpu:
         send_model_to_cpu(sd_model)
-        timer.record("send model to cpu")
+        timer.record("send to cpu")
 
     already_loaded = None
     for i in reversed(range(len(model_data.loaded_sd_models))):
@@ -902,11 +903,11 @@ def reuse_model_from_already_loaded(sd_model, checkpoint_info, timer):
             print(f"Unloading model {len(model_data.loaded_sd_models)} over the limit of {shared.opts.sd_checkpoints_limit}: {loaded_model.sd_checkpoint_info.title}")
             del model_data.loaded_sd_models[i]
             send_model_to_trash(loaded_model)
-            timer.record("send model to trash")
+            timer.record("send to trash")
 
     if already_loaded is not None:
         send_model_to_device(already_loaded)
-        timer.record("send model to device")
+        timer.record("send to device")
 
         model_data.set_sd_model(already_loaded, already_loaded=True)
 
@@ -914,7 +915,7 @@ def reuse_model_from_already_loaded(sd_model, checkpoint_info, timer):
             shared.opts.data["sd_model_checkpoint"] = already_loaded.sd_checkpoint_info.title
             shared.opts.data["sd_checkpoint_hash"] = already_loaded.sd_checkpoint_info.sha256
 
-        print(f"Using already loaded model {already_loaded.sd_checkpoint_info.title}: done in {timer.summary()}")
+        print(f"Using loaded model {already_loaded.sd_checkpoint_info.name}: done in {timer.summary()}")
         sd_vae.reload_vae_weights(already_loaded)
         return model_data.sd_model
     elif shared.opts.sd_checkpoints_limit > 1 and len(model_data.loaded_sd_models) < shared.opts.sd_checkpoints_limit:
@@ -931,7 +932,7 @@ def reuse_model_from_already_loaded(sd_model, checkpoint_info, timer):
         sd_vae.loaded_vae_file = getattr(sd_model, "loaded_vae_file", None)
         sd_vae.checkpoint_info = sd_model.sd_checkpoint_info
 
-        print(f"Reusing loaded model {sd_model.sd_checkpoint_info.title} to load {checkpoint_info.title}")
+        print(f"Reusing loaded model {sd_model.sd_checkpoint_info.name} to load {checkpoint_info.name}")
         return sd_model
     else:
         return None
@@ -989,7 +990,7 @@ def reload_model_weights(sd_model=None, info=None, forced_reload=False):
 
         if not sd_model.lowvram:
             sd_model.to(devices.device)
-            timer.record("move model to device")
+            timer.record("move to device")
 
         script_callbacks.model_loaded_callback(sd_model)
         timer.record("script callbacks")

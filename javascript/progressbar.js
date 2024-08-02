@@ -99,7 +99,6 @@ function requestProgress(id_task, progressContainer, gallery, atEnd, onProgress,
 
     let tick = opts.live_preview_refresh_period || 999, i = 0
     let func = function (id_task, id_live_preview) {
-        requestWakeLock();
         request('./internal/progress', {id_task, id_live_preview}, function (res) {
             if (res.completed) {
                 bar.style.width = '100%'

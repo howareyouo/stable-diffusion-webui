@@ -534,7 +534,8 @@ def create_ui(interface: gr.Blocks, unrelated_tabs, tabname):
             return ui.pages_contents
 
         button_refresh = gr.Button("Refresh", elem_id=f"{tabname_full}_refresh_internal", visible=False)
-        button_refresh.click(fn=refresh, outputs=ui.pages).then(fn=lambda: None, _js=f"() => applyExtraNetworkFilter('{tabname_full}', 1)").then(fn=lambda: None, _js='setupAllResizeHandles')
+        button_refresh.click(fn=refresh, outputs=ui.pages).then(fn=lambda: None, _js=f"() => applyExtraNetworkFilter('{tabname_full}', 1)")
+        # .then(fn=lambda: None, _js='setupAllResizeHandles')
 
     def create_html():
         ui.pages_contents = [pg.create_html(ui.tabname) for pg in ui.stored_extra_pages]

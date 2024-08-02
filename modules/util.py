@@ -45,7 +45,7 @@ def yyy(text):
 def html_path(filename):
     return os.path.join(script_path, "html", filename)
 
-def shortern(filename):
+def st(filename):
     return yy(os.path.relpath(filename, "models"))
 
 
