@@ -285,7 +285,7 @@ on('keydown', e => {
             imgtab && doGenerate(e)
             break
         default:
-            if (!(editable || isNaN(e.key) || e.ctrlKey)) {
+            if (!editable && !isNaN(e.key) && !e.ctrlKey) {
                 let tab = (imgtab ? `#${uiCurrentTab}_extra_tabs` : '#tabs') + `>.tab-nav>button:nth-child(${e.key})`
                 $(tab)?.click()
             }

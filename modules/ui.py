@@ -300,7 +300,7 @@ def create_ui():
 
                     elif category == "cfg":
                         with gr.Row():
-                            cfg_scale = gr.Slider(minimum=1.0, maximum=30.0, step=0.5, label='CFG Scale', value=7.0, elem_id="txt2img_cfg_scale")
+                            cfg_scale = gr.Slider(minimum=1.0, maximum=30.0, step=.5, label='CFG Scale', value=7.0, elem_id="txt2img_cfg_scale")
 
                     elif category == "checkboxes":
                         with FormRow(elem_classes="checkboxes-row", variant="compact"):
@@ -315,10 +315,10 @@ def create_ui():
                                 with FormRow(elem_id="txt2img_hires_fix_row1", variant="compact"):
                                     hr_upscaler = gr.Dropdown(label="Upscaler", elem_id="txt2img_hr_upscaler", choices=[*shared.latent_upscale_modes, *[x.name for x in shared.sd_upscalers]], value=shared.latent_upscale_default_mode)
                                     hr_second_pass_steps = gr.Slider(minimum=0, maximum=30, step=1, label='Hires steps', value=5, elem_id="txt2img_hires_steps")
-                                    denoising_strength = gr.Slider(minimum=0, maximum=1, step=.05, label='Denoising strength', value=0.7, elem_id="txt2img_denoising_strength")
+                                    denoising_strength = gr.Slider(minimum=0, maximum=1, step=.05, label='Denoising strength', value=.3, elem_id="txt2img_denoising_strength")
 
                                 with FormRow(elem_id="txt2img_hires_fix_row2", variant="compact"):
-                                    hr_scale = gr.Slider(minimum=1.0, maximum=4.0, step=0.05, label="Upscale by", value=2.0, elem_id="txt2img_hr_scale")
+                                    hr_scale = gr.Slider(minimum=1.0, maximum=4.0, step=.05, label="Upscale by", value=2.0, elem_id="txt2img_hr_scale")
                                     hr_resize_x = gr.Slider(minimum=0, maximum=2048, step=8, label="Resize width to", value=0, elem_id="txt2img_hr_resize_x")
                                     hr_resize_y = gr.Slider(minimum=0, maximum=2048, step=8, label="Resize height to", value=0, elem_id="txt2img_hr_resize_y")
 
@@ -633,7 +633,7 @@ def create_ui():
                                                 detect_image_size_btn = ToolButton(value=detect_image_size_symbol, elem_id="img2img_detect_image_size_btn", tooltip="Auto detect size from img2img")
 
                                     with gr.Tab(label="Resize by", id="by", elem_id="img2img_tab_resize_by") as tab_scale_by:
-                                        scale_by = gr.Slider(minimum=0.05, maximum=4.0, step=0.05, label="Scale", value=1.0, elem_id="img2img_scale")
+                                        scale_by = gr.Slider(minimum=.05, maximum=4.0, step=.05, label="Scale", value=1.0, elem_id="img2img_scale")
 
                                         with FormRow():
                                             scale_by_html = FormHTML(resize_from_to_html(0, 0, 0.0), elem_id="img2img_scale_resolution_preview")
@@ -660,12 +660,12 @@ def create_ui():
                                     batch_size = gr.Slider(minimum=1, maximum=8, step=1, label='Batch size', value=1, elem_id="img2img_batch_size")
 
                     elif category == "denoising":
-                        denoising_strength = gr.Slider(minimum=0.0, maximum=1.0, step=0.01, label='Denoising strength', value=0.75, elem_id="img2img_denoising_strength")
+                        denoising_strength = gr.Slider(minimum=.0, maximum=1.0, step=.01, label='Denoising strength', value=.75, elem_id="img2img_denoising_strength")
 
                     elif category == "cfg":
                         with gr.Row():
-                            cfg_scale = gr.Slider(minimum=1.0, maximum=30.0, step=0.5, label='CFG Scale', value=7.0, elem_id="img2img_cfg_scale")
-                            image_cfg_scale = gr.Slider(minimum=0, maximum=3.0, step=0.05, label='Image CFG Scale', value=1.5, elem_id="img2img_image_cfg_scale", visible=False)
+                            cfg_scale = gr.Slider(minimum=1.0, maximum=30.0, step=.5, label='CFG Scale', value=7.0, elem_id="img2img_cfg_scale")
+                            image_cfg_scale = gr.Slider(minimum=0, maximum=3.0, step=.05, label='Image CFG Scale', value=1.5, elem_id="img2img_image_cfg_scale", visible=False)
 
                     elif category == "checkboxes":
                         with FormRow(elem_classes="checkboxes-row", variant="compact"):
@@ -980,7 +980,7 @@ def create_ui():
                     preview_from_txt2img = gr.Checkbox(label='Read parameters (prompt, etc...) from txt2img tab when making previews', value=False, elem_id="train_preview_from_txt2img")
 
                     shuffle_tags = gr.Checkbox(label="Shuffle tags by ',' when creating prompts.", value=False, elem_id="train_shuffle_tags")
-                    tag_drop_out = gr.Slider(minimum=0, maximum=1, step=0.1, label="Drop out tags when creating prompts.", value=0, elem_id="train_tag_drop_out")
+                    tag_drop_out = gr.Slider(minimum=0, maximum=1, step=.1, label="Drop out tags when creating prompts.", value=0, elem_id="train_tag_drop_out")
 
                     latent_sampling_method = gr.Radio(label='Choose latent sampling method', value="once", choices=['once', 'deterministic', 'random'], elem_id="train_latent_sampling_method")
 

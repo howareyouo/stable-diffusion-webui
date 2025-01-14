@@ -1125,12 +1125,11 @@ div.accordions > div.input-accordion.input-accordion-open{
 .extra-network-html {
     display: flex;
     flex-direction: column;
-    max-height: calc(100vh - 26.5rem);
+    max-height: calc(100vh - 25rem);
     overflow: hidden;
 }
 
 .extra-network-cards {
-    min-height: 50rem;
     overflow: clip scroll;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));

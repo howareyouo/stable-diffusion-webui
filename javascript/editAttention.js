@@ -133,7 +133,7 @@ function editAttention(e) {
         end = text.indexOf(bracket, start)
         if (bracket == '<') delta = opts.keyedit_precision_extra
     }
-    if (e.altKey) delta = .01
+    if (e.altKey) delta = .05
 
     let replacement = text.substring(start, end)
     let parts = replacement.split(':')
@@ -164,7 +164,7 @@ function editAttention(e) {
                 wordEnd--
             }
         } else {
-            // wordStart = start + 1
+            // wordStart = start + parts[0].length + 1
             // wordEnd = wordStart + parts[1].length
         }
         replacement = parts.join(':')

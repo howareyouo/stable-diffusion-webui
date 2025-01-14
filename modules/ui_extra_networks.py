@@ -505,8 +505,7 @@ def create_ui(interface: gr.Blocks, unrelated_tabs, tabname):
     for page in ui.stored_extra_pages:
         tabname_full = tabname + "_" + page.extra_networks_tabname
         with gr.Tab(page.title, elem_id=tabname_full, elem_classes=["extra-page"]) as tab:
-            with gr.Column(elem_id=f"{tabname_full}_prompts", elem_classes=["extra-page-prompts"]):
-                pass
+            # with gr.Column(elem_id=f"{tabname_full}_prompts", elem_classes=["extra-page-prompts"]): pass
 
             page_elem = gr.HTML(page.create_html(tabname, empty=True), elem_id=f"{tabname_full}_html", elem_classes="extra-network-html")
             ui.pages.append(page_elem)
