@@ -6,11 +6,6 @@ from modules.options import OptionHTML, OptionInfo
 from modules.shared_cmd_options import cmd_opts
 
 
-def realesrgan_models_names():
-    import modules.realesrgan_model
-    return [x.name for x in modules.realesrgan_model.get_realesrgan_models(None)]
-
-
 def dat_models_names():
     import modules.dat_model
     return [x.name for x in modules.dat_model.get_dat_models(None)]
