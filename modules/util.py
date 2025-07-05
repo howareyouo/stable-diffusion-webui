@@ -24,6 +24,15 @@ def rr(text):
 def rrr(text):
     return Fore.LIGHTRED_EX + text + Fore.RESET
 
+def m(text):
+    return Style.DIM + Fore.MAGENTA + text + Fore.RESET
+
+def mm(text):
+    return Fore.MAGENTA + text + Fore.RESET
+
+def mmm(text):
+    return Fore.LIGHTMAGENTA_EX + text + Fore.RESET
+
 def g(text):
     return Style.DIM + Fore.GREEN + text + Fore.RESET
 
@@ -46,6 +55,7 @@ def html_path(filename):
     return os.path.join(script_path, "html", filename)
 
 def st(filename):
+    """ shorten filename """
     return yy(os.path.relpath(filename, "models"))
 
 

@@ -17,7 +17,7 @@ from modules.timer import Timer
 from modules.shared import opts
 import tomesd
 import numpy as np
-from modules.util import st, y, yy
+from modules.util import st, yy, m
 
 model_dir = "Stable-diffusion"
 model_path = os.path.abspath(os.path.join(paths.models_path, model_dir))
@@ -812,7 +812,7 @@ def load_model(checkpoint_info=None, already_loaded_state_dict=None):
 
     timer.record("load config")
 
-    print(f"Creating model from config: {checkpoint_config}")
+    print(f"Creating model using: {m(checkpoint_config)}")
 
     sd_model = None
     try:
@@ -869,9 +869,9 @@ def load_model(checkpoint_info=None, already_loaded_state_dict=None):
     with devices.autocast(), torch.no_grad():
         sd_model.cond_stage_model_empty_prompt = get_empty_cond(sd_model)
 
-    timer.record("calc empty prompt")
+    timer.record("calc conds")
 
-    print(f"Model loaded in {timer.summary()}.")
+    print(f"Model loaded in {timer.summary()}")
 
     return sd_model
 
@@ -915,11 +915,11 @@ def reuse_model_from_already_loaded(sd_model, checkpoint_info, timer):
             shared.opts.data["sd_model_checkpoint"] = already_loaded.sd_checkpoint_info.title
             shared.opts.data["sd_checkpoint_hash"] = already_loaded.sd_checkpoint_info.sha256
 
-        print(f"Using loaded model {already_loaded.sd_checkpoint_info.name}: done in {timer.summary()}")
+        print(f"Using loaded model {yy(already_loaded.sd_checkpoint_info.name)}: done in {timer.summary()}")
         sd_vae.reload_vae_weights(already_loaded)
         return model_data.sd_model
     elif shared.opts.sd_checkpoints_limit > 1 and len(model_data.loaded_sd_models) < shared.opts.sd_checkpoints_limit:
-        print(f"Loading model {checkpoint_info.title} ({len(model_data.loaded_sd_models) + 1} out of {shared.opts.sd_checkpoints_limit})")
+        print(f"Loading model {yy(checkpoint_info.name)} ({len(model_data.loaded_sd_models) + 1} out of {shared.opts.sd_checkpoints_limit})")
 
         model_data.sd_model = None
         load_model(checkpoint_info)
@@ -932,7 +932,7 @@ def reuse_model_from_already_loaded(sd_model, checkpoint_info, timer):
         sd_vae.loaded_vae_file = getattr(sd_model, "loaded_vae_file", None)
         sd_vae.checkpoint_info = sd_model.sd_checkpoint_info
 
-        print(f"Reusing loaded model {sd_model.sd_checkpoint_info.name} to load {checkpoint_info.name}")
+        print(f"Reusing loaded model {yy(sd_model.sd_checkpoint_info.name)} to load {checkpoint_info.name}")
         return sd_model
     else:
         return None

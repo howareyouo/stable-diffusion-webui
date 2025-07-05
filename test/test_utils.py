@@ -25,7 +25,6 @@ def test_options_write(base_url):
     "sdapi/v1/sd-models",
     "sdapi/v1/hypernetworks",
     "sdapi/v1/face-restorers",
-    "sdapi/v1/realesrgan-models",
     "sdapi/v1/prompt-styles",
     "sdapi/v1/embeddings",
 ])

@@ -3,6 +3,7 @@ import collections
 from dataclasses import dataclass
 
 from modules import paths, shared, devices, script_callbacks, sd_models, extra_networks, lowvram, sd_hijack, hashes
+from modules.util import m
 
 import glob
 from copy import deepcopy
@@ -200,12 +201,12 @@ def load_vae(model, vae_file=None, vae_source="from unknown source"):
     if vae_file:
         if cache_enabled and vae_file in checkpoints_loaded:
             # use vae checkpoint cache
-            print(f"Loading VAE weights {vae_source}: cached {get_filename(vae_file)}")
+            print(f"Loading VAE {m(vae_source)}: cached {m(get_filename(vae_file))}")
             store_base_vae(model)
             _load_vae_dict(model, checkpoints_loaded[vae_file])
         else:
             assert os.path.isfile(vae_file), f"VAE {vae_source} doesn't exist: {vae_file}"
-            print(f"Loading VAE weights {vae_source}: {vae_file}")
+            print(f"Loading VAE {vae_source}: {m(vae_file)}")
             store_base_vae(model)
 
             vae_dict_1 = load_vae_dict(vae_file, map_location=shared.weight_load_location)
